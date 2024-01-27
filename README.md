@@ -10,9 +10,11 @@ Python client classes and advance assertions for testing environments. REST, Kaf
 
 ## Getting Started
 
-Testing a service `orders`.
+E.g. Let's say we are testing a service `orders`.
 
 ```python
+
+# Create synchronous Kafka consumer and start consuming topic "orders" 
 kafka_consumer = KafkaConsumer(topics=['orders'])
 
 # POST order
@@ -20,11 +22,10 @@ response = orders_client.request(
 	RestRequest('POST', '/orders', order_payload)
 )
 
-# Assert REST response
-assert_json_response(response, 200)
-
-assert_json(
-	response.json(),
+# Assert POST response
+assert_json_response(
+	response,
+	200,
 	expected_json_schema={
 		'type': 'object',
 		'properties': {
@@ -35,9 +36,9 @@ assert_json(
 	}
 )
 
-# Assert Kafka message
+# Assert the service publishes the expected Kafka message
 msg = kafka_consumer.consume_one(timeout=4.0)
-assert_kafka_message(msg, event_type='ProvisionCreated')
+assert_kafka_message(msg, event_type='OrderCreated')
 
 ```
 
