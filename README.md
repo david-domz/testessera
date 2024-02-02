@@ -10,15 +10,14 @@ Python client classes and advance assertions for testing environments. REST, Kaf
 
 ## Highlights
 
-- Minimize boilerplate test code and facilitate test code readability.
-- Protocols support:
+- Minimize boilerplate test code and enhance test code readability.
+- Supports protocols:
   - HTTP/REST
   - Kafka
   - Redis (coming soon)
-- `pytest` smooth integration by instantiating client classes as fixtures.
-- Extensible.
-  - `RestClient` and `RestRequest` can be derived for customization and minimal initialization (examples soon).
-
+- Smooth integration with `pytest` by instantiating client classes as fixtures.
+- Extensible:
+  - `RestClient` and `RestRequest` can be derived for customization and minimal initialization (examples coming soon).
 
 ## Getting Started
 
@@ -36,7 +35,7 @@ response = orders_client.request(
 assert_rest_response(
 	response,
 	200,
-	expected_json_schema={
+	json_schema={
 		'type': 'object',
 		'properties': {
 			'order_id': {'type': 'string'},
