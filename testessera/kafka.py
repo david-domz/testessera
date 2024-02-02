@@ -211,7 +211,7 @@ class KafkaProducer():
 		print('Done')
 
 
-def assert_json_kafka_message(msg: Message, expected_json_instance=None, expected_json_schema=None, **kwargs):
+def assert_kafka_message(msg: Message, expected_json_instance=None, expected_json_schema=None, **kwargs):
 	"""Asserts the contents of a JSON message consumed from Kafka.
 
 	Args:
@@ -236,26 +236,3 @@ def assert_json_kafka_message(msg: Message, expected_json_instance=None, expecte
 		actual_value = json_instance[key]
 		assert actual_value == expected_value,	\
 			f'Expected property `{key}` value was {expected_value} but got value {actual_value}'
-
-
-def assert_kafka_consume_one(
-		kafka_consumer: KafkaConsumer,
-		expected_json_instance=None,
-		expected_json_schema=None,
-		**kwargs):
-	"""Consumes a single Kafka message using the provided KafkaConsumer and asserts its JSON content.
-
-	Args:
-		kafka_consumer (KafkaConsumer):		The KafkaConsumer instance to consume messages from.
-		expected_json_instance (dict | None):	The expected JSON instance to compare against (optional).
-		expected_json_schema (dict | None):	The expected JSON schema to validate against (optional).
-		**kwargs (dict):			Additional keyword arguments to compare specific property values. Property names
-			should be provided as keys, and expected values as values.
-
-	Raises:
-		AssertionError:		Assertion fails.
-		JSONDecodeError:	Error decoding the JSON content of the message.
-
-	"""
-	msg = kafka_consumer.consume_one()
-	assert_json_kafka_message(msg, expected_json_instance, expected_json_schema, **kwargs)

@@ -5,17 +5,17 @@ from testessera.json import assert_json
 
 class RestRequest():
 
-	def __init__(self, verb: str, path: str, json_data: dict = None):
+	def __init__(self, method: str, path: str, json_data: dict = None):
 
-		self._verb = verb
+		self._method = method
 		self._path = path
 		self._headers = {}
 		self._json_data = json_data
 
 	@property
-	def verb(self):
+	def method(self):
 
-		return self._verb
+		return self._method
 
 	@property
 	def path(self):
@@ -33,18 +33,16 @@ class RestRequest():
 		return self._json_data
 
 
-
 class RestClient():
 	"""
 
 	Attributes:
 
 		_base_url (str)
-		_api_key
+		_api_key (str)
 		_timeout (float)
 
 	"""
-
 	def __init__(self, base_url: str, api_key=None, timeout: int = 60, verify=None):
 
 		self._base_url = base_url
@@ -55,13 +53,11 @@ class RestClient():
 		self._session = requests.Session()
 
 
-
 	def request(self, rest_request: RestRequest) -> requests.Response:
 		"""
 
 		Raises:
-			requests.exceptions.SSLError:	Unable to verify the certificate
-			requests.exceptions.ConnectTimeout
+			requests.exceptions	
 
 		"""
 		url = f'{self._base_url}{rest_request.path}'
@@ -70,22 +66,28 @@ class RestClient():
 		if self._api_key:
 			headers = {'X-API-Key': self._api_key}
 
-		return self._request(rest_request.verb, url, headers=headers, json_data=rest_request.json)
+		# return self._request(rest_request.method, url, headers=headers, json_data=rest_request.json)
 
 
-	def _request(self, method, url, headers=None, json_data=None) -> requests.Response:
+	# def _request(self, method, url, headers=None, json_data=None) -> requests.Response:
 
-		request = requests.Request(method, url, headers, json=json_data)
+		request = requests.Request(rest_request.method, url, headers, json=rest_request.json)
 		prepared_request = request.prepare()
 
 		return self._session.send(prepared_request, verify=self._verify, timeout=self._timeout)
 
 
-def assert_response(
-		response: requests.Response,
-		status_code: int,
-		headers: dict | None = None):
+def assert_http_response(response: requests.Response, status_code: int, headers=None):
+	"""Asserts HTTP response.
 
+	Args:
+		response (requests.Response):
+		status_code (int):	Expected status code.
+		headers (dict):		Expected headers.
+		json_instance (dict):	Expected JSON instance.
+		json_schema (dict):	Expected JSON schema.
+
+	"""
 	assert response.status_code == status_code,	\
 		f'Expected status was {status_code} but got status {response.status_code} and response body `{response.text}`'
 
@@ -94,18 +96,34 @@ def assert_response(
 			assert response.headers[header].casefold() == value.casefold()
 
 
-def assert_json_response(
+def assert_rest_response(
 		response: requests.Response,
 		status_code: int,
+		headers=None,
 		json_instance=None,
 		json_schema=None):
+	"""Asserts REST response.
 
-	assert_response(response, status_code)
+	Args:
+		response (requests.Response):
+		status_code (int):	Expected status code.
+		headers (dict):		Expected headers.
+		json_instance (dict):	Expected JSON instance.
+		json_schema (dict):	Expected JSON schema.
 
+	"""
+	assert response.status_code == status_code,	\
+		f'Expected status was {status_code} but got status {response.status_code} and response body `{response.text}`'
 
-	if response.text:
+	if headers:
+		for header, value in headers.items():
+			assert response.headers[header].casefold() == value.casefold()
+
+	if json_instance or json_schema:
+		# Assert Content-Type is JSON
 		content_type = response.headers.get('Content-Type')
-		assert content_type == 'application/json' or content_type.startswith('application/json;')
+		assert content_type == 'application/json' or content_type.startswith('application/json;'),	\
+			f'Expected Content-Type application/json but got {content_type}'
 
 		assert_json(response.json(), json_instance, json_schema)
 
@@ -123,20 +141,20 @@ def assert_problem_json_response(
 	See RFC7807 "Problem Details for HTTP APIs" https://www.rfc-editor.org/rfc/rfc7807.html
 
 	Args:
-		status_code:	Expected status code.
-		type_:		It can be the exact string to compare with or a regular expression.
-		title:		It can be the exact string to compare with or a regular expression.
-		detail:		It can be the exact string to compare with or a regular expression.
-		instance	It can be the exact string to compare with or a regular expression.
+		status_code(int):	Expected status code.
+		type_:		The exact string to compare with or a regular expression.
+		title:		The exact string to compare with or a regular expression.
+		detail:		The exact string to compare with or a regular expression.
+		instance:	The exact string to compare with or a regular expression.
 
 	"""
 	def assert_problem_json_status_code():
 
-		# Assert HTTP status code
+		# Assert HTTP status codeThe
 		assert response.status_code == status_code,	\
 			f'Expected status was `{status_code}` but got status `{response.status_code}` and response body `{response.text}`'
 
-		# Assert `status` field if present
+		# Assert status if present
 		status = response_json.get('status')
 		if status is not None:
 			assert status == status_code
@@ -154,27 +172,3 @@ def assert_problem_json_response(
 	assert_problem_json_field('title', title)
 	assert_problem_json_field('detail', detail)
 	assert_problem_json_field('instance', instance)
-
-
-def assert_request_response(
-		rest_client: RestClient,
-		rest_request: RestRequest,
-		status_code: int,
-		headers: dict | None = None):
-
-	response = rest_client.request(rest_request)
-
-	assert_response(response, status_code, headers)
-
-
-def assert_request_json_response(
-		rest_client: RestClient,
-		rest_request: RestRequest,
-		status_code: int,
-		headers: dict | None = None,
-		json_instance=None,
-		json_schema=None):
-
-	response = rest_client.request(rest_request)
-
-	assert_json_response(response, status_code, json_instance, json_schema)

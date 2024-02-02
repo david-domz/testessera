@@ -7,6 +7,17 @@ Python client classes and advance assertions for testing environments. REST, Kaf
 
 *Disclaimer: this is a work in progress project, stay tuned for updates.*
 
+<!-- 
+## Highlights
+
+- Minimize boilerplate code.
+- Test source readability.
+- Protocols supported:
+  - HTTP/REST
+  - Kafka
+  - Redis
+- Extensible.
+ -->
 
 ## Getting Started
 
@@ -42,9 +53,11 @@ assert_kafka_message(msg, event_type='OrderCreated')
 
 ```
 
-# Dependencies
+## Dependencies
 
+```bash
 jsonschema==3.2.0
 requests==2.31.0
 confluent-kafka==2.0.2
 redis==4.6.0
+```
