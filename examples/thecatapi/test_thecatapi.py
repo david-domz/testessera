@@ -1,6 +1,6 @@
 import pytest
 from testessera import assert_rest_response
-from thecatapi import TheCatApiClient, BreedGet
+from testessera_thecatapi import TheCatApiClient, BreedGet
 
 
 @pytest.fixture(scope='session')
@@ -11,7 +11,15 @@ def thecatapi_client():
 
 def test_get_breed(thecatapi_client: TheCatApiClient):
 	# pylint: disable=redefined-outer-name
+	"""Tests GET /breeds/abyss
 
+	When:
+		- breed id is abyss
+	Then:
+		- Status code 200
+		- Response includes id, name, and optionally, origin
+
+	"""
 	response = thecatapi_client.request(BreedGet(breed_id='abys'))
 
 	assert_rest_response(
