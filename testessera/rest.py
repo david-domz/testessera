@@ -66,11 +66,6 @@ class RestClient():
 		if self._api_key:
 			headers = {'X-API-Key': self._api_key}
 
-		# return self._request(rest_request.method, url, headers=headers, json_data=rest_request.json)
-
-
-	# def _request(self, method, url, headers=None, json_data=None) -> requests.Response:
-
 		request = requests.Request(rest_request.method, url, headers, json=rest_request.json)
 		prepared_request = request.prepare()
 
