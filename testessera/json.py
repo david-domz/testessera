@@ -19,8 +19,7 @@ def assert_json(json_instance, expected_json_instance=None, expected_json_schema
 			against.
 
 	Raises:
-		AssertionError:	The JSON instance doesn't match the expected instance or
-			schema.
+		AssertionError:	The JSON instance doesn't match the expected instance or schema.
 
 	Example:
 
@@ -39,7 +38,7 @@ def assert_json(json_instance, expected_json_instance=None, expected_json_schema
 
 	"""
 	if expected_json_instance and expected_json_schema:
-		assert ValueError('Provide only expected_json_instance or expected_json_schema, not both.')
+		raise ValueError('Provide only expected_json_instance or expected_json_schema, not both.')
 
 	if expected_json_instance:
 		assert json_instance == expected_json_instance,	\
@@ -48,4 +47,6 @@ def assert_json(json_instance, expected_json_instance=None, expected_json_schema
 		try:
 			jsonschema.validate(json_instance, expected_json_schema)
 		except jsonschema.ValidationError as e:
-			raise AssertionError('JSON instance does not match the expected JSON schema') from e
+			raise AssertionError('JSON instance does not match the expected schema') from e
+	else:
+		raise ValueError('Provide expected_json_instance or expected_json_schema')

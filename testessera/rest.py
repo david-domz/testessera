@@ -37,10 +37,11 @@ class RestClient():
 	"""
 
 	Attributes:
-
 		_base_url (str)
 		_api_key (str)
 		_timeout (float)
+		_verify (bool)
+		_session (requests.Session)
 
 	"""
 	def __init__(self, base_url: str, api_key=None, timeout: int = 60, verify=None):
@@ -79,8 +80,6 @@ def assert_http_response(response: requests.Response, status_code: int, headers=
 		response (requests.Response):
 		status_code (int):	Expected status code.
 		headers (dict):		Expected headers.
-		json_instance (dict):	Expected JSON instance.
-		json_schema (dict):	Expected JSON schema.
 
 	"""
 	assert response.status_code == status_code,	\
@@ -100,11 +99,11 @@ def assert_rest_response(
 	"""Asserts REST response.
 
 	Args:
-		response (requests.Response):
-		status_code (int):	Expected status code.
-		headers (dict):		Expected headers.
-		json_instance (dict):	Expected JSON instance.
-		json_schema (dict):	Expected JSON schema.
+		response (requests.Response):	Request response.
+		status_code (int):		Expected status code.
+		headers (Optional[dict]):	Expected headers.
+		json_instance (Optional[dict]):	Expected JSON instance.
+		json_schema (Optional[dict]):	Expected JSON schema.
 
 	"""
 	assert response.status_code == status_code,	\
@@ -126,26 +125,26 @@ def assert_rest_response(
 def assert_problem_json_response(
 		response: requests.Response,
 		status_code: int,
-		type_: str | None = None,
-		title: str | None = None,
-		detail: str | None = None,
-		instance: str | None = None):
+		type_: str = '',
+		title: str = '',
+		detail: str = '',
+		instance: str = ''):
 	# pylint: disable=too-many-arguments
 	"""Asserts RFC7807 compliant error JSON responses.
 
 	See RFC7807 "Problem Details for HTTP APIs" https://www.rfc-editor.org/rfc/rfc7807.html
 
 	Args:
-		status_code(int):	Expected status code.
-		type_:		The exact string to compare with or a regular expression.
-		title:		The exact string to compare with or a regular expression.
-		detail:		The exact string to compare with or a regular expression.
-		instance:	The exact string to compare with or a regular expression.
+		status_code (int):	Expected status code.
+		type_:			The exact string to compare with or a regular expression.
+		title:			The exact string to compare with or a regular expression.
+		detail:			The exact string to compare with or a regular expression.
+		instance:		The exact string to compare with or a regular expression.
 
 	"""
 	def assert_problem_json_status_code():
 
-		# Assert HTTP status codeThe
+		# Assert status code
 		assert response.status_code == status_code,	\
 			f'Expected status was `{status_code}` but got status `{response.status_code}` and response body `{response.text}`'
 
@@ -154,9 +153,9 @@ def assert_problem_json_response(
 		if status is not None:
 			assert status == status_code
 
-	def assert_problem_json_field(field: str, value: str | None = None):
-		# Assert str field
-		if value is not None:
+	def assert_problem_json_field(field: str, value: str):
+
+		if value:
 			pattern = re.compile(value)
 			assert pattern.match(response_json[field])
 

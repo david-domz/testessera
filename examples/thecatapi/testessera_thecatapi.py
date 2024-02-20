@@ -1,7 +1,7 @@
 """The Cat API testessera extension.
 
-The Cat API (https://thecatapi.com/) is a fun API that provides random cat images and facts. It's commonly used for
-testing and demonstrating API integration.
+The Cat API (https://thecatapi.com/) is a fun API that provides random cat images and facts. It's
+commonly used for testing and demonstrating API integration.
 
 """
 from testessera import RestClient, RestRequest
