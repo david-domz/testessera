@@ -5,12 +5,19 @@ from testessera.json import assert_json
 
 class RestRequest():
 
-	def __init__(self, method: str, path: str, json_data: dict = None):
+	def __init__(self, method: str, path: str, json_data=None, headers=None, query_params=None):
+
+		if headers is None:
+			headers = {}
+		if query_params is None:
+			query_params = {}
 
 		self._method = method
 		self._path = path
 		self._headers = {}
 		self._json_data = json_data
+		self._heaaders = headers
+		self._query_params = query_params
 
 	@property
 	def method(self):
@@ -23,14 +30,21 @@ class RestRequest():
 		return self._path
 
 	@property
-	def headers(self):
+	def headers(self) -> dict:
 
 		return self._headers
+
+	@property
+	def query_params(self) -> dict:
+		return self._query_params
 
 	@property
 	def json(self):
 
 		return self._json_data
+
+	def __str__(self):
+		return f'RestRequest({self.method}, {self.path}, {self.headers}, {self._json_data})'
 
 
 class RestClient():
@@ -61,7 +75,7 @@ class RestClient():
 			requests.exceptions	
 
 		"""
-		url = f'{self._base_url}{rest_request.path}'
+		url = self._build_url(rest_request)
 
 		headers = None
 		if self._api_key:
@@ -71,6 +85,18 @@ class RestClient():
 		prepared_request = request.prepare()
 
 		return self._session.send(prepared_request, verify=self._verify, timeout=self._timeout)
+
+
+	def _build_url(self, rest_request: RestRequest) -> str:
+
+		query_params = [f'{param}={value}' for param, value in rest_request.query_params.items()]
+		if query_params:
+			query_params = '&'.join(query_params)
+			url = f'{self._base_url}{rest_request.path}?{query_params}'
+		else:
+			url = f'{self._base_url}{rest_request.path}'
+
+		return url
 
 
 def assert_http_response(response: requests.Response, status_code: int, headers=None):

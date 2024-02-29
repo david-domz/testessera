@@ -8,5 +8,6 @@ from testessera.rest import (
 from testessera.kafka import (
 	KafkaConsumer,
 	KafkaProducer,
-	assert_kafka_message
+	assert_kafka_message,
+	assert_no_kafka_message
 )

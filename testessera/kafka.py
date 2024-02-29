@@ -123,7 +123,7 @@ class KafkaConsumer():
 					break
 
 
-	def consume_one(self, timeout: float = 300.0) -> Optional[Message]:
+	def consume_one(self, timeout: float = 2.0) -> Optional[Message]:
 		"""Consume and process a single Kafka message.
 
 		This method consumes a single Kafka message and process it. If a message
@@ -132,7 +132,7 @@ class KafkaConsumer():
 
 		Args:
 			timeout (float, optional): The maximum time (in seconds) to wait for a
-				message. Defaults to 300.0 seconds (5 minutes).
+				message. Defaults to 2.0 seconds.
 
 		Returns:
 			Optional[Message]: The consumed Kafka message if available, or None if no message
@@ -148,7 +148,7 @@ class KafkaConsumer():
 		return None
 
 
-	def consume_many(self, num_messages: int, timeout: float = 300.0) -> deque[Message]:
+	def consume_many(self, num_messages: int, timeout: float = 2.0) -> deque[Message]:
 		"""Consume and process multiple Kafka messages.
 
 		If the requested number of messages are successfully consumed within
@@ -163,7 +163,7 @@ class KafkaConsumer():
 		Args:
 			num_messages (int): The maximum number of messages to consume and process.
 			timeout (float, optional): The maximum time (in seconds) to wait for messages.
-				Defaults to 300.0 seconds (5 minutes).
+				Defaults to 2.0 seconds.
 
 		Returns:
 			deque[Message]: A deque containing the consumed Kafka messages. The deque may
@@ -269,3 +269,9 @@ def assert_kafka_message(
 		actual_value = json_instance[key]
 		assert actual_value == expected_value,	\
 			f'Expected property `{key}` value was {expected_value} but got value {actual_value}'
+
+
+def assert_no_kafka_message(msg: Optional[Message]):
+	"""Asserts no message was consumed from Kafka. """
+
+	assert msg is None, f'An unexpected message was published {json.loads(msg.value())}'
