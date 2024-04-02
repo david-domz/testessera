@@ -11,3 +11,6 @@ from testessera.kafka import (
 	assert_kafka_message,
 	assert_no_kafka_message
 )
+
+VERSION = '0.0.1'
+"""Testessera package version. """

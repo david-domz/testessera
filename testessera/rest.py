@@ -11,7 +11,6 @@ class RestRequest():
 			headers = {}
 		if query_params is None:
 			query_params = {}
-
 		self._method = method
 		self._path = path
 		self._headers = {}
@@ -81,6 +80,7 @@ class RestClient():
 		if self._api_key:
 			headers = {'X-API-Key': self._api_key}
 
+		# TODO: Use params instead of _build_url()
 		request = requests.Request(rest_request.method, url, headers, json=rest_request.json)
 		prepared_request = request.prepare()
 
@@ -151,11 +151,11 @@ def assert_rest_response(
 def assert_problem_json_response(
 		response: requests.Response,
 		status_code: int,
-		type_: str = '',
+		type: str = '',
 		title: str = '',
 		detail: str = '',
 		instance: str = ''):
-	# pylint: disable=too-many-arguments
+	# pylint: disable=too-many-arguments disable=redefined-builtin
 	"""Asserts RFC7807 compliant error JSON responses.
 
 	See RFC7807 "Problem Details for HTTP APIs" https://www.rfc-editor.org/rfc/rfc7807.html
@@ -188,7 +188,7 @@ def assert_problem_json_response(
 	response_json = response.json()
 
 	assert_problem_json_status_code()
-	assert_problem_json_field('type', type_)
+	assert_problem_json_field('type', type)
 	assert_problem_json_field('title', title)
 	assert_problem_json_field('detail', detail)
 	assert_problem_json_field('instance', instance)
