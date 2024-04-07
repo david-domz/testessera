@@ -3,9 +3,12 @@ import requests
 from testessera.json import assert_json
 
 
+SUCCESS_2XX = 0
+
+
 class RestRequest():
 
-	def __init__(self, method: str, path: str, json_data=None, headers=None, query_params=None):
+	def __init__(self, method: str, path: str, body=None, headers=None, query_params=None):
 
 		if headers is None:
 			headers = {}
@@ -13,9 +16,8 @@ class RestRequest():
 			query_params = {}
 		self._method = method
 		self._path = path
-		self._headers = {}
-		self._json_data = json_data
-		self._heaaders = headers
+		self._body = body
+		self._headers = headers
 		self._query_params = query_params
 
 	@property
@@ -38,12 +40,12 @@ class RestRequest():
 		return self._query_params
 
 	@property
-	def json(self):
+	def body(self):
 
-		return self._json_data
+		return self._body
 
 	def __str__(self):
-		return f'RestRequest({self.method}, {self.path}, {self.headers}, {self._json_data})'
+		return f'RestRequest({self.method}, {self.path}, {self.headers}, {self._body})'
 
 
 class RestClient():
@@ -73,6 +75,8 @@ class RestClient():
 		Raises:
 			requests.exceptions	
 
+		TODO: Consider using Request params instead of _build_url()
+
 		"""
 		url = self._build_url(rest_request)
 
@@ -80,7 +84,6 @@ class RestClient():
 		if self._api_key:
 			headers = {'X-API-Key': self._api_key}
 
-		# TODO: Use params instead of _build_url()
 		request = requests.Request(rest_request.method, url, headers, json=rest_request.json)
 		prepared_request = request.prepare()
 
@@ -100,7 +103,7 @@ class RestClient():
 
 
 def assert_http_response(response: requests.Response, status_code: int, headers=None):
-	"""Asserts HTTP response.
+	"""Asserts an HTTP response.
 
 	Args:
 		response (requests.Response):
@@ -109,7 +112,7 @@ def assert_http_response(response: requests.Response, status_code: int, headers=
 
 	"""
 	assert response.status_code == status_code,	\
-		f'Expected status was {status_code} but got status {response.status_code} and response body `{response.text}`'
+		f'Expected status was {status_code} but got status {response.status_code} and response body {response.text}'
 
 	if headers:
 		for header, value in headers.items():
@@ -118,11 +121,11 @@ def assert_http_response(response: requests.Response, status_code: int, headers=
 
 def assert_rest_response(
 		response: requests.Response,
-		status_code: int,
+		status_code: int = SUCCESS_2XX,
 		headers=None,
 		json_instance=None,
 		json_schema=None):
-	"""Asserts REST response.
+	"""Asserts a REST response.
 
 	Args:
 		response (requests.Response):	Request response.
@@ -132,8 +135,12 @@ def assert_rest_response(
 		json_schema (Optional[dict]):	Expected JSON schema.
 
 	"""
-	assert response.status_code == status_code,	\
-		f'Expected status was {status_code} but got status {response.status_code} and response body `{response.text}`'
+	if status_code:
+		assert response.status_code == status_code,	\
+			f'Expected status was {status_code} but got status {response.status_code} and response body {response.text}'
+	else:
+		assert response.status_code // 100 == 2,	\
+			f'Expected 2XX status but got status {response.status_code} and response body {response.text}'
 
 	if headers:
 		for header, value in headers.items():
@@ -162,7 +169,7 @@ def assert_problem_json_response(
 
 	Args:
 		status_code (int):	Expected status code.
-		type_:			The exact string to compare with or a regular expression.
+		type (str):		The exact string to compare with or a regular expression.
 		title:			The exact string to compare with or a regular expression.
 		detail:			The exact string to compare with or a regular expression.
 		instance:		The exact string to compare with or a regular expression.
@@ -172,7 +179,7 @@ def assert_problem_json_response(
 
 		# Assert status code
 		assert response.status_code == status_code,	\
-			f'Expected status was `{status_code}` but got status `{response.status_code}` and response body `{response.text}`'
+			f'Expected status was {status_code} but got status {response.status_code} and response body `{response.text}`'
 
 		# Assert status if present
 		status = response_json.get('status')

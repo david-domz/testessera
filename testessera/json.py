@@ -1,21 +1,21 @@
 import jsonschema
 
 
-def assert_json(json_instance, expected_json_instance=None, expected_json_schema=None):
-	"""Validates JSON instances against expected instance or schema.
+def assert_json(instance, expected_instance=None, expected_schema=None):
+	"""Validates a JSON instance against a expected JSON instance or schema.
 
-	If `expected_json_instance` is provided, a direct comparison is made.
+	If `expected_instance` is provided, a direct comparison is made.
 
-	If `expected_json_schema` is provided, the function utilizes `jsonschema` to validate the
+	If `expected_schema` is provided, the function utilizes `jsonschema` to validate the
 	JSON instance against it.
 
 	Args:
-		json_instance (dict or list):	The JSON instance to be asserted.
+		instance (dict or list):	The JSON instance to be asserted.
 
-		expected_json_instance (dict or list, optional):	The expected JSON instance
+		expected_instance (dict or list, optional):	The expected JSON instance
 			for direct comparison.
 
-		expected_json_schema (dict, optional):	The JSON schema to validate the instance
+		expected_schema (dict, optional):	The JSON schema to validate the instance
 			against.
 
 	Raises:
@@ -26,7 +26,7 @@ def assert_json(json_instance, expected_json_instance=None, expected_json_schema
 		# Schema-based validation
 		assert_json(
 			json_data,
-			expected_json_schema={
+			expected_schema={
 				'type': 'object',
 				'properties': {
 					'name': {'type': 'string'},
@@ -37,16 +37,16 @@ def assert_json(json_instance, expected_json_instance=None, expected_json_schema
 		)
 
 	"""
-	if expected_json_instance and expected_json_schema:
-		raise ValueError('Provide only expected_json_instance or expected_json_schema, not both.')
+	if expected_instance and expected_schema:
+		raise ValueError('Provide either `expected_instance` or `expected_schema`, not both')
 
-	if expected_json_instance:
-		assert json_instance == expected_json_instance,	\
-			f'Expected JSON response body was `{expected_json_instance}` but got `{json_instance}`'
-	elif expected_json_schema:
+	if expected_instance:
+		assert instance == expected_instance,	\
+			f'Expected JSON response body was `{expected_instance}` but got `{instance}`'
+	elif expected_schema:
 		try:
-			jsonschema.validate(json_instance, expected_json_schema)
+			jsonschema.validate(instance, expected_schema)
 		except jsonschema.ValidationError as e:
-			raise AssertionError('JSON instance does not match the expected schema') from e
+			raise AssertionError(f'JSON instance does not match the expected schema. {e}.') from e
 	else:
-		raise ValueError('Provide expected_json_instance or expected_json_schema')
+		raise ValueError('Provide expected_instance or expected_schema')

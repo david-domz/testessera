@@ -2,29 +2,26 @@ import pytest
 from testessera import assert_json
 
 
-def test_assert_json_instance_success():
-	"""Test comparison where JSON instances match. """
+def test_assert_instance_expected_instance_success():
 
-	test_json = {'name': 'John', 'age': 30}
-	expected_json = {'name': 'John', 'age': 30}
+	instance = {'name': 'John', 'age': 30}
+	expected_instance = {'name': 'John', 'age': 30}
 
-	assert_json(test_json, expected_json_instance=expected_json)
+	assert_json(instance, expected_instance=expected_instance)
 
 
-def test_assert_json_instance_failure():
-	"""Test comparison where JSON instances do not match. """
+def test_assert_instance_expected_instance_failure():
 
-	test_json = {'name': 'John', 'age': 30}
-	expected_json = {'name': 'Jane', 'age': 25}
+	instance = {'name': 'John', 'age': 30}
+	expected_instance = {'name': 'Jane', 'age': 25}
 
 	with pytest.raises(AssertionError):
-		assert_json(test_json, expected_json_instance=expected_json)
+		assert_json(instance, expected_instance=expected_instance)
 
 
-def test_assert_json_schema_success():
-	"""Test schema validation where JSON instance matches schema. """
+def test_assert_json_expected_schema_success():
 
-	test_json = {
+	instance = {
 		'name': 'John',
 		'age': 30
 	}
@@ -43,13 +40,12 @@ def test_assert_json_schema_success():
 			'age'
 		]
 	}
-	assert_json(test_json, expected_json_schema=expected_schema)
+	assert_json(instance, expected_schema=expected_schema)
 
 
-def test_assert_json_schema_failure():
-	"""Test schema validation where JSON instance doesn't match schema. """
+def test_assert_json_expected_schema_failure():
 
-	test_json = {
+	instance = {
 		'name': 'John',
 		'age': 'thirty'
 	}
@@ -69,20 +65,20 @@ def test_assert_json_schema_failure():
 		]
 	}
 	with pytest.raises(AssertionError):
-		assert_json(test_json, expected_json_schema=expected_schema)
+		assert_json(instance, expected_schema=expected_schema)
 
 
-def test_assert_json_both_parameters_provided():
+def test_assert_json_value_error_both_parameters_provided():
 
 	with pytest.raises(ValueError):
 		assert_json(
 			{'name': 'John', 'age': 30},
-			expected_json_instance={'name': 'John', 'age': 30},
-			expected_json_schema={'type': 'object'}
+			expected_instance={'name': 'John', 'age': 30},
+			expected_schema={'type': 'object'}
 		)
 
 
-def test_assert_json_neither_parameter_provided():
+def test_assert_json_value_error_neither_parameter_provided():
 
 	with pytest.raises(ValueError):
 		assert_json({'name': 'John', 'age': 30})

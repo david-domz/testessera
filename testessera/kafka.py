@@ -11,12 +11,13 @@ from confluent_kafka import (
 	KafkaError
 )
 from testessera.json import assert_json
+import testessera.generator
 
 
 class KafkaConsumer():
 	"""Kafka consumer for testing environments.
 
-	This class encapsulates a Kafka consumer using the `confluent_kafka` library. It allows
+	It encapsulates a Kafka consumer using the `confluent_kafka` library. It allows
 	for the consumption and processing of Kafka messages from specified topics.
 
 	Attributes:
@@ -34,10 +35,11 @@ class KafkaConsumer():
 		"""
 
 		Args:
-			topics (optional):	List of topic names to subscribe to, or mapping of
-				topic names to queues for consumption. If a mapping of topic names
-				to queues is provided, the consumer's received messages are added
-				to their respective queues for separate processing.
+			topics (list[str] or dict[str, deque], optional):	List of topic
+				names to subscribe to, or mapping of topic names to queues for
+				consumption. If a mapping of topic names to queues is provided,
+				the consumer's received messages are added to their respective queues
+				for separate processing.
 
 			bootstrap_servers (str, optional):
 
@@ -124,9 +126,9 @@ class KafkaConsumer():
 
 
 	def consume_one(self, timeout: float = 2.0) -> Optional[Message]:
-		"""Consume and process a single Kafka message.
+		"""Consumes and processes a Kafka message.
 
-		This method consumes a single Kafka message and process it. If a message
+		It consumes a single Kafka message and process it. If a message
 		is successfully consumed within the given timeout, it is returned. If no message is
 		received within the timeout, None is returned.
 
@@ -162,6 +164,7 @@ class KafkaConsumer():
 
 		Args:
 			num_messages (int): The maximum number of messages to consume and process.
+
 			timeout (float, optional): The maximum time (in seconds) to wait for messages.
 				Defaults to 2.0 seconds.
 
@@ -274,4 +277,4 @@ def assert_kafka_message(
 def assert_no_kafka_message(msg: Optional[Message]):
 	"""Asserts no message was consumed from Kafka. """
 
-	assert msg is None, f'An unexpected message was published {json.loads(msg.value())}'
+	assert msg is None, f'An unexpected message was published {msg.value()}'
