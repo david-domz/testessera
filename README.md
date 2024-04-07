@@ -66,6 +66,12 @@ msg = kafka_consumer.consume_one(timeout=4.0)
 assert_kafka_message(msg, event_type='OrderCreated')
 
 ```
+If the assertion fails an AssertionError exception will be raised.
+
+```python
+AssertionError: No Kafka message provided. If you called consume_one() or consume_many() they timed out
+```
+
 
 ## Dependencies
 
