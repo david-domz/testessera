@@ -84,7 +84,7 @@ class RestClient():
 		if self._api_key:
 			headers = {'X-API-Key': self._api_key}
 
-		request = requests.Request(rest_request.method, url, headers, json=rest_request.json)
+		request = requests.Request(rest_request.method, url, headers, json=rest_request.body)
 		prepared_request = request.prepare()
 
 		return self._session.send(prepared_request, verify=self._verify, timeout=self._timeout)

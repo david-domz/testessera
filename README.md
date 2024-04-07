@@ -1,6 +1,6 @@
 # Testessera
 
-Python client classes and advance assertions for testing environments. REST, Kafka and Redis support.
+Python client classes and advance assertions for testing environments. REST and Kafka support.
 
 - Tessera (τεσσέρα) - Four, used to refer to the four elements (earth, water, air, fire) or the four cardinal directions (north, south, east, west)
 - Test - The means by which the quality of anything is determined.
@@ -14,10 +14,9 @@ Python client classes and advance assertions for testing environments. REST, Kaf
 - Supports protocols:
   - HTTP/REST
   - Kafka
-  - Redis (coming soon)
-- Smooth integration with `pytest` by instantiating client classes as fixtures.
+- Smooth integration with `pytest`.
 - Extensible:
-  - `RestClient` and `RestRequest` can be derived for customization and minimal initialization (examples coming soon).
+  - `RestClient` and `RestRequest` can be derived for customization and minimal initialization.
 
 ## Getting Started
 
@@ -44,6 +43,12 @@ assert_rest_response(
 		'required': ['order_id']
 	}
 )
+```
+
+If the assertion fails an `AssertionError` exception will be raised.
+
+```python
+AssertionError: Expected status was 200 but got status 400 and response body INVALID_DATA
 ```
 
 ### Testing a Kafka Message Publication
