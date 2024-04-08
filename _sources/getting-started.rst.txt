@@ -1,0 +1,33 @@
+Getting Started
+======================================
+
+Testing a REST Request
+
+E.g. Let's say we are testing a service orders.
+
+..sourcecode ::
+
+	orders_client = RestClient(base_url='api.orders.test')
+
+	response = orders_client.request(
+		RestRequest('POST', '/orders', order_payload)
+	)
+
+	assert_rest_response(
+		response,
+		200,
+		json_schema={
+			'type': 'object',
+			'properties': {
+				'order_id': {'type': 'string'},
+				'items': {'type': 'array'}
+			},
+			'required': ['order_id']
+		}
+	)
+
+If the assertion fails an AssertionError exception will be raised.
+
+..sourcecode::
+
+	AssertionError: Expected status was 200 but got status 400 and response body INVALID_DATA
