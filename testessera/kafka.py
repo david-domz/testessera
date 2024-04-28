@@ -1,3 +1,6 @@
+"""Testessera Kafka related classes and functions.
+
+"""
 from typing import Optional, Union
 from collections import deque
 import logging

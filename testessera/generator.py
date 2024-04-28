@@ -1,3 +1,6 @@
+"""Provides functions that return realistic test data.
+
+"""
 from datetime import datetime, timedelta
 import random
 
@@ -201,7 +204,7 @@ _PERSON_SURNAMES = [
 
 
 def utc_now_zulu_str() -> str:
-	"""E.g. 2023-09-20T10:30:00Z """
+	"""Returns the current UTC date and time string. E.g. 2023-09-20T10:30:00Z """
 
 	return datetime.strftime(datetime.utcnow(), _ZULU_TIME_FORMAT)
 
@@ -213,7 +216,7 @@ def delta_ago_zulu_str(days: float = 0, seconds: float = 0, minutes: float =0, h
 
 
 def mac_address() -> str:
-	"""E.g. 10:66:61:0E:3F:C1 """
+	"""Returns a random MAC address. E.g. 10:66:61:0E:3F:C1 """
 
 	# The first byte of a MAC address should start with a 0 in the least significant bit
 	# 0x00 to 0x7F in hexadecimal
@@ -228,6 +231,7 @@ def mac_address() -> str:
 
 
 def phone_number() -> str:
+	"""Returns a random phone number. """
 
 	first_digit = random.choice([6, 7, 9])
 	rest_digits = ''.join(str(random.randint(0, 9)) for _ in range(8))
@@ -236,13 +240,13 @@ def phone_number() -> str:
 
 
 def person_name() -> str:
-	"""E.g. Isaiah """
+	"""Returns a person name. E.g. Isaiah """
 
 	return random.choice(_PERSON_NAMES)
 
 
 def person_full_name() -> str:
-	"""E.g. Isaiah Morgan """
+	"""Returns a person ful lname. E.g. Isaiah Morgan """
 
 	random_name = random.choice(_PERSON_NAMES)
 	random_surname = random.choice(_PERSON_SURNAMES)

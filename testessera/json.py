@@ -23,18 +23,20 @@ def assert_json(instance, expected_instance=None, expected_schema=None):
 
 	Example:
 
-		# Schema-based validation
-		assert_json(
-			json_data,
-			expected_schema={
-				'type': 'object',
-				'properties': {
-					'name': {'type': 'string'},
-					'age': {'type': 'number'}
-				},
-				'required': ['name']
-			}
-		)
+		..sourcecode ::
+
+			# Schema-based validation
+			assert_json(
+				json_data,
+				expected_schema={
+					'type': 'object',
+					'properties': {
+						'name': {'type': 'string'},
+						'age': {'type': 'number'}
+					},
+					'required': ['name']
+				}
+			)
 
 	"""
 	if expected_instance and expected_schema:

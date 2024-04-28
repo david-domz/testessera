@@ -1,9 +1,13 @@
+"""Testessera REST related classes and functions.
+
+"""
 import re
 import requests
 from testessera.json import assert_json
 
 
 SUCCESS_2XX = 0
+"""int: Used to specify any successful HTTP status code in `assert_rest_response()`. """
 
 
 class RestRequest():
@@ -22,11 +26,12 @@ class RestRequest():
 
 	@property
 	def method(self):
-
+		"""HTTP method; usually POST, PUT, PATCH or DELETE. """
 		return self._method
 
 	@property
 	def path(self):
+		"""Request URL path. """
 
 		return self._path
 
@@ -37,6 +42,8 @@ class RestRequest():
 
 	@property
 	def query_params(self) -> dict:
+		"""Request URL query parameters. """
+
 		return self._query_params
 
 	@property
@@ -52,11 +59,11 @@ class RestClient():
 	"""
 
 	Attributes:
-		_base_url (str)
-		_api_key (str)
-		_timeout (float)
-		_verify (bool)
-		_session (requests.Session)
+		_base_url (str):		REST API base url. E.g. `https://api.thecatapi.com/v1`.
+		_api_key (str, optional):	API key.
+		_timeout (float):		Timeout passed into `requests` module at every request.
+		_verify (bool):
+		_session (requests.Session):	Underlaying `requests.Session`.
 
 	"""
 	def __init__(self, base_url: str, api_key=None, timeout: int = 60, verify=None):
@@ -72,10 +79,14 @@ class RestClient():
 	def request(self, rest_request: RestRequest) -> requests.Response:
 		"""
 
-		Raises:
-			requests.exceptions	
+		The effective request URL is compose by combining the `_base_url` attribute with
+		`RestRequest.path` and `RestRequest.query_params`.
 
-		TODO: Consider using Request params instead of _build_url()
+		Raises:
+			requests.RequestException
+
+		Note:
+			* Consider using Request params instead of _build_url()
 
 		"""
 		url = self._build_url(rest_request)
@@ -106,9 +117,9 @@ def assert_http_response(response: requests.Response, status_code: int, headers=
 	"""Asserts an HTTP response.
 
 	Args:
-		response (requests.Response):
-		status_code (int):	Expected status code.
-		headers (dict):		Expected headers.
+		response (requests.Response):	Response object.
+		status_code (int):		Expected status code.
+		headers (Optional[dict]):	Expected headers.
 
 	"""
 	assert response.status_code == status_code,	\
@@ -163,16 +174,37 @@ def assert_problem_json_response(
 		detail: str = '',
 		instance: str = ''):
 	# pylint: disable=too-many-arguments disable=redefined-builtin
-	"""Asserts RFC7807 compliant error JSON responses.
+	"""Asserts RFC9457 compliant error JSON responses.
 
-	See RFC7807 "Problem Details for HTTP APIs" https://www.rfc-editor.org/rfc/rfc7807.html
+	RFC9457 defines a "problem detail" to carry machine-readable details of errors in HTTP
+	response content to avoid the need to define new error response formats for HTTP APIs.
 
 	Args:
 		status_code (int):	Expected status code.
-		type (str):		The exact string to compare with or a regular expression.
-		title:			The exact string to compare with or a regular expression.
-		detail:			The exact string to compare with or a regular expression.
-		instance:		The exact string to compare with or a regular expression.
+		type (str):		Expected type.
+		title (str):		Expected title.
+		detail (str):		Expected detail.
+		instance (str):		Expected instance.
+
+	Example:
+		.. code-block::
+
+			HTTP/1.1 404 Not Found
+			Content-Type: application/problem+json
+			Content-Language: en
+
+			{
+				"type": "https://bookstore.example.com/problems/book-not-found",
+				"title": "Book Not Found",
+				"status": 404,
+				"detail": "The book with ID 12345 could not be found in our database.",
+				"instance": "/api/books/12345",
+				"timestamp": "2023-11-28T12:34:56Z",
+				"custom-field": "Additional information or context here"
+			}
+
+	References:
+		- RFC9457 "Problem Details for HTTP APIs" https://www.rfc-editor.org/rfc/rfc9457
 
 	"""
 	def assert_problem_json_status_code():
