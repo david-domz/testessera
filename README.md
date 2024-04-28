@@ -10,10 +10,8 @@ Python client classes and advance assertions for testing environments. REST and 
 
 ## Highlights
 
-- Minimize boilerplate test code and enhance test code readability.
-- Supports protocols:
-  - HTTP/REST
-  - Kafka
+- Minimizes boilerplate test code and enhances test code readability.
+- Supports HTTP/REST and Kafka.
 - Smooth integration with `pytest`.
 - Extensible:
   - `RestClient` and `RestRequest` can be derived for customization and minimal initialization.
