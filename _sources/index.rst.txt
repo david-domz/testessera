@@ -1,65 +1,146 @@
-.. testessera documentation master file, created by
-   sphinx-quickstart on Sun Apr  7 23:20:09 2024.
+.. Testessera documentation master file, created by
+   sphinx-quickstart on Sun Apr 28 17:22:09 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to testessera's documentation!
+Welcome to Testessera's documentation!
 ======================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. .. toctree::
+..    :maxdepth: 2
+..    :caption: Contents
 
-   highlights
-   getting-started
+..    intro
+..    testessera
+
+* :ref:`Features <features>`
+* :ref:`Getting Started <getting_started>`
+* :ref:`Extending Testessera To Test Your API <extending>`
+* :ref:`Reference <reference>`
+* :ref:`Indices And Tables <indices_and_tables>`
 
 
-Highlights
-----------
+.. _features:
 
-- Minimize boilerplate test code and enhance test code readability.
-- Supports protocols:
-	- HTTP/REST
-	- Kafka
+Features
+========
+
+- Minimizes boilerplate test code and enhances test code readability.
+- Supports HTTP/REST and Kafka.
 - Smooth integration with pytest.
 - Extensible.
 	- RestClient and RestRequest can be derived for customization and minimal initialization.
 
+.. _getting_started:
 
 Getting Started
----------------
+===============
 
-Testing a REST Request
+Testing a REST API
+------------------
 
-E.g. Let's say we are testing a service orders.
+E.g. Let's say we are testing a service `orders`.
 
-..sourcecode ::
 
-	orders_client = RestClient(base_url='api.orders.test')
+.. sourcecode:: Python
 
-	response = orders_client.request(
-		RestRequest('POST', '/orders', order_payload)
-	)
+   from testessera import RestClient, assert_rest_response
 
-	assert_rest_response(
-		response,
-		200,
-		json_schema={
-			'type': 'object',
-			'properties': {
-				'order_id': {'type': 'string'},
-				'items': {'type': 'array'}
-			},
-			'required': ['order_id']
-		}
-	)
+   orders_client = RestClient(base_url='api.orders.test')
+
+   response = orders_client.request(
+      RestRequest('POST', '/orders', order_payload)
+   )
+
+   assert_rest_response(
+      response,
+      200,
+      json_schema={
+         'type': 'object',
+         'properties': {
+            'order_id': {'type': 'string'},
+            'items': {'type': 'array'}
+         },
+         'required': ['order_id']
+      }
+   )
+
+If the assertion fails an `AssertionError` exception will be raised.
+
+.. sourcecode:: Python
+
+   AssertionError: Expected status was 200 but got status 400 and response body INVALID_DATA
+
+Testing A Kafka Message Publication
+-----------------------------------
+
+.. sourcecode:: python
+
+   from testessera import RestClient, KafkaConsumer, assert_kafka_message
+
+   orders_client = RestClient(base_url='api.orders.test')
+   kafka_consumer = KafkaConsumer(topics=['orders'])
+
+   response = orders_client.request(
+      RestRequest('POST', '/orders', order_payload)
+   )
+
+   msg = kafka_consumer.consume_one(timeout=4.0)
+
+   assert_kafka_message(msg, event_type='OrderCreated')
 
 If the assertion fails an AssertionError exception will be raised.
 
-..sourcecode::
+.. sourcecode:: python
 
-	AssertionError: Expected status was 200 but got status 400 and response body INVALID_DATA
+   AssertionError: No Kafka message provided. If you called consume_one() or consume_many() they timed out
 
+.. _extending:
+
+Extending `testessera` To Test Your API
+========================================
+
+- Create a `::py:class:testessera.RestClient`` -derived class per each REST API.
+- Create a :py:testessera.RestRequest -derived class per each API endpoint.
+
+.. sourcecode:: Python
+
+   class CatGet(RestRequest):
+      def __init__(self)
+         ...
+
+.. _reference:
+
+Reference
+=========
+
+.. _testessera_rest:
+
+.. automodule:: testessera.rest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. _testessera_restrequest:
+
+.. autoclass:: testessera.RestRequest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. _testessera_restclient:
+
+.. autoclass:: testessera.RestClient
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. _testessera_kafkaconsumer:
+
+.. autoclass:: testessera.KafkaConsumer
+   :members:
+
+.. _indices_and_tables:
 
 Indices and tables
 ==================

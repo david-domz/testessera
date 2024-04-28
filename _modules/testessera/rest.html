@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>testessera.rest &mdash; Testessera 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Testessera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference - Code API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../testessera.html">testessera package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Testessera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">testessera.rest</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for testessera.rest</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Testessera REST related classes and functions.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">testessera.json</span> <span class="kn">import</span> <span class="n">assert_json</span>
+
+
+<span class="n">SUCCESS_2XX</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="sd">&quot;&quot;&quot;int: Used to specify any successful HTTP status code in `assert_rest_response()`. &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="RestRequest">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.RestRequest">[docs]</a>
+<span class="k">class</span> <span class="nc">RestRequest</span><span class="p">():</span>
+
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+		<span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="k">if</span> <span class="n">query_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">query_params</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_body</span> <span class="o">=</span> <span class="n">body</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="o">=</span> <span class="n">headers</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_query_params</span> <span class="o">=</span> <span class="n">query_params</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;HTTP method; usually POST, PUT, PATCH or DELETE. &quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;Request URL path. &quot;&quot;&quot;</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">headers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">query_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;Request URL query parameters. &quot;&quot;&quot;</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_params</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span>
+
+	<span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;RestRequest(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="si">}</span><span class="s1">)&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="RestClient">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.RestClient">[docs]</a>
+<span class="k">class</span> <span class="nc">RestClient</span><span class="p">():</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">	Attributes:</span>
+<span class="sd">		_base_url (str):		REST API base url. E.g. `https://api.thecatapi.com/v1`.</span>
+<span class="sd">		_api_key (str, optional):	API key.</span>
+<span class="sd">		_timeout (float):		Timeout passed into `requests` module at every request.</span>
+<span class="sd">		_verify (bool):</span>
+<span class="sd">		_session (requests.Session):	Underlaying `requests.Session`.</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_verify</span> <span class="o">=</span> <span class="n">verify</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RestClient.request">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.RestClient.request">[docs]</a>
+	<span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rest_request</span><span class="p">:</span> <span class="n">RestRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">		The effective request URL is compose by combining the `_base_url` attribute with</span>
+<span class="sd">		`RestRequest.path` and `RestRequest.query_params`.</span>
+
+<span class="sd">		Raises:</span>
+<span class="sd">			requests.RequestException</span>
+
+<span class="sd">		Note:</span>
+<span class="sd">			* Consider using Request params instead of _build_url()</span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_url</span><span class="p">(</span><span class="n">rest_request</span><span class="p">)</span>
+
+		<span class="n">headers</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_key</span><span class="p">:</span>
+			<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;X-API-Key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_key</span><span class="p">}</span>
+
+		<span class="n">request</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">rest_request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">rest_request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+		<span class="n">prepared_request</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">prepared_request</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">)</span></div>
+
+
+
+	<span class="k">def</span> <span class="nf">_build_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rest_request</span><span class="p">:</span> <span class="n">RestRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+		<span class="n">query_params</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">rest_request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+		<span class="k">if</span> <span class="n">query_params</span><span class="p">:</span>
+			<span class="n">query_params</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query_params</span><span class="p">)</span>
+			<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span><span class="si">}{</span><span class="n">rest_request</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">?</span><span class="si">{</span><span class="n">query_params</span><span class="si">}</span><span class="s1">&#39;</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span><span class="si">}{</span><span class="n">rest_request</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span>
+
+		<span class="k">return</span> <span class="n">url</span></div>
+
+
+
+<div class="viewcode-block" id="assert_http_response">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.assert_http_response">[docs]</a>
+<span class="k">def</span> <span class="nf">assert_http_response</span><span class="p">(</span><span class="n">response</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">,</span> <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Asserts an HTTP response.</span>
+
+<span class="sd">	Args:</span>
+<span class="sd">		response (requests.Response):	Response object.</span>
+<span class="sd">		status_code (int):		Expected status code.</span>
+<span class="sd">		headers (Optional[dict]):	Expected headers.</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">status_code</span><span class="p">,</span>	\
+		<span class="sa">f</span><span class="s1">&#39;Expected status was </span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> but got status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> and response body </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span>
+
+	<span class="k">if</span> <span class="n">headers</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+			<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="n">header</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="assert_rest_response">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.assert_rest_response">[docs]</a>
+<span class="k">def</span> <span class="nf">assert_rest_response</span><span class="p">(</span>
+		<span class="n">response</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">,</span>
+		<span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">SUCCESS_2XX</span><span class="p">,</span>
+		<span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+		<span class="n">json_instance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+		<span class="n">json_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Asserts a REST response.</span>
+
+<span class="sd">	Args:</span>
+<span class="sd">		response (requests.Response):	Request response.</span>
+<span class="sd">		status_code (int):		Expected status code.</span>
+<span class="sd">		headers (Optional[dict]):	Expected headers.</span>
+<span class="sd">		json_instance (Optional[dict]):	Expected JSON instance.</span>
+<span class="sd">		json_schema (Optional[dict]):	Expected JSON schema.</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="n">status_code</span><span class="p">:</span>
+		<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">status_code</span><span class="p">,</span>	\
+			<span class="sa">f</span><span class="s1">&#39;Expected status was </span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> but got status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> and response body </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">//</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span>	\
+			<span class="sa">f</span><span class="s1">&#39;Expected 2XX status but got status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> and response body </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span>
+
+	<span class="k">if</span> <span class="n">headers</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+			<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="n">header</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span>
+
+	<span class="k">if</span> <span class="n">json_instance</span> <span class="ow">or</span> <span class="n">json_schema</span><span class="p">:</span>
+		<span class="c1"># Assert Content-Type is JSON</span>
+		<span class="n">content_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">)</span>
+		<span class="k">assert</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span> <span class="ow">or</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;application/json;&#39;</span><span class="p">),</span>	\
+			<span class="sa">f</span><span class="s1">&#39;Expected Content-Type application/json but got </span><span class="si">{</span><span class="n">content_type</span><span class="si">}</span><span class="s1">&#39;</span>
+
+		<span class="n">assert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">json_instance</span><span class="p">,</span> <span class="n">json_schema</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="assert_problem_json_response">
+<a class="viewcode-back" href="../../testessera.html#testessera.rest.assert_problem_json_response">[docs]</a>
+<span class="k">def</span> <span class="nf">assert_problem_json_response</span><span class="p">(</span>
+		<span class="n">response</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">,</span>
+		<span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+		<span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+		<span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+		<span class="n">detail</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+		<span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+	<span class="c1"># pylint: disable=too-many-arguments disable=redefined-builtin</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Asserts RFC9457 compliant error JSON responses.</span>
+
+<span class="sd">	RFC9457 defines a &quot;problem detail&quot; to carry machine-readable details of errors in HTTP</span>
+<span class="sd">	response content to avoid the need to define new error response formats for HTTP APIs.</span>
+
+<span class="sd">	Args:</span>
+<span class="sd">		status_code (int):	Expected status code.</span>
+<span class="sd">		type (str):		Expected type.</span>
+<span class="sd">		title (str):		Expected title.</span>
+<span class="sd">		detail (str):		Expected detail.</span>
+<span class="sd">		instance (str):		Expected instance.</span>
+
+<span class="sd">	Example:</span>
+<span class="sd">		.. code-block::</span>
+
+<span class="sd">			HTTP/1.1 404 Not Found</span>
+<span class="sd">			Content-Type: application/problem+json</span>
+<span class="sd">			Content-Language: en</span>
+
+<span class="sd">			{</span>
+<span class="sd">				&quot;type&quot;: &quot;https://bookstore.example.com/problems/book-not-found&quot;,</span>
+<span class="sd">				&quot;title&quot;: &quot;Book Not Found&quot;,</span>
+<span class="sd">				&quot;status&quot;: 404,</span>
+<span class="sd">				&quot;detail&quot;: &quot;The book with ID 12345 could not be found in our database.&quot;,</span>
+<span class="sd">				&quot;instance&quot;: &quot;/api/books/12345&quot;,</span>
+<span class="sd">				&quot;timestamp&quot;: &quot;2023-11-28T12:34:56Z&quot;,</span>
+<span class="sd">				&quot;custom-field&quot;: &quot;Additional information or context here&quot;</span>
+<span class="sd">			}</span>
+
+<span class="sd">	References:</span>
+<span class="sd">		- RFC9457 &quot;Problem Details for HTTP APIs&quot; https://www.rfc-editor.org/rfc/rfc9457</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">assert_problem_json_status_code</span><span class="p">():</span>
+
+		<span class="c1"># Assert status code</span>
+		<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">status_code</span><span class="p">,</span>	\
+			<span class="sa">f</span><span class="s1">&#39;Expected status was </span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> but got status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> and response body `</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">`&#39;</span>
+
+		<span class="c1"># Assert status if present</span>
+		<span class="n">status</span> <span class="o">=</span> <span class="n">response_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">assert</span> <span class="n">status</span> <span class="o">==</span> <span class="n">status_code</span>
+
+	<span class="k">def</span> <span class="nf">assert_problem_json_field</span><span class="p">(</span><span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+		<span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+			<span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+			<span class="k">assert</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">response_json</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
+
+	<span class="n">response_json</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+	<span class="n">assert_problem_json_status_code</span><span class="p">()</span>
+	<span class="n">assert_problem_json_field</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+	<span class="n">assert_problem_json_field</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+	<span class="n">assert_problem_json_field</span><span class="p">(</span><span class="s1">&#39;detail&#39;</span><span class="p">,</span> <span class="n">detail</span><span class="p">)</span>
+	<span class="n">assert_problem_json_field</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, David D..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

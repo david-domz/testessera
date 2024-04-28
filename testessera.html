@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>testessera package &mdash; Testessera 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Testessera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">testessera package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#testessera.VERSION"><code class="docutils literal notranslate"><span class="pre">VERSION</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-testessera.generator">testessera.generator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.delta_ago_zulu_str"><code class="docutils literal notranslate"><span class="pre">delta_ago_zulu_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.mac_address"><code class="docutils literal notranslate"><span class="pre">mac_address()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.person_full_name"><code class="docutils literal notranslate"><span class="pre">person_full_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.person_name"><code class="docutils literal notranslate"><span class="pre">person_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.phone_number"><code class="docutils literal notranslate"><span class="pre">phone_number()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.generator.utc_now_zulu_str"><code class="docutils literal notranslate"><span class="pre">utc_now_zulu_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-testessera.json">testessera.json module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.json.assert_json"><code class="docutils literal notranslate"><span class="pre">assert_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-testessera.kafka">testessera.kafka module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.kafka.KafkaConsumer"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer.consumer"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer.consumer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer._topic_queue_mapping"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer._topic_queue_mapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer.close"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer.consume_many"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer.consume_many()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer.consume_one"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer.consume_one()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaConsumer.subscribe"><code class="docutils literal notranslate"><span class="pre">KafkaConsumer.subscribe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.kafka.KafkaProducer"><code class="docutils literal notranslate"><span class="pre">KafkaProducer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.kafka.KafkaProducer.produce"><code class="docutils literal notranslate"><span class="pre">KafkaProducer.produce()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.kafka.assert_kafka_message"><code class="docutils literal notranslate"><span class="pre">assert_kafka_message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.kafka.assert_no_kafka_message"><code class="docutils literal notranslate"><span class="pre">assert_no_kafka_message()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-testessera.rest">testessera.rest module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.RestClient"><code class="docutils literal notranslate"><span class="pre">RestClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient._base_url"><code class="docutils literal notranslate"><span class="pre">RestClient._base_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient._api_key"><code class="docutils literal notranslate"><span class="pre">RestClient._api_key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient._timeout"><code class="docutils literal notranslate"><span class="pre">RestClient._timeout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient._verify"><code class="docutils literal notranslate"><span class="pre">RestClient._verify</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient._session"><code class="docutils literal notranslate"><span class="pre">RestClient._session</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestClient.request"><code class="docutils literal notranslate"><span class="pre">RestClient.request()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.RestRequest"><code class="docutils literal notranslate"><span class="pre">RestRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestRequest.body"><code class="docutils literal notranslate"><span class="pre">RestRequest.body</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestRequest.headers"><code class="docutils literal notranslate"><span class="pre">RestRequest.headers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestRequest.method"><code class="docutils literal notranslate"><span class="pre">RestRequest.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestRequest.path"><code class="docutils literal notranslate"><span class="pre">RestRequest.path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testessera.rest.RestRequest.query_params"><code class="docutils literal notranslate"><span class="pre">RestRequest.query_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.SUCCESS_2XX"><code class="docutils literal notranslate"><span class="pre">SUCCESS_2XX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.assert_http_response"><code class="docutils literal notranslate"><span class="pre">assert_http_response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.assert_problem_json_response"><code class="docutils literal notranslate"><span class="pre">assert_problem_json_response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testessera.rest.assert_rest_response"><code class="docutils literal notranslate"><span class="pre">assert_rest_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Testessera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">testessera package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/testessera.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-testessera">
+<span id="testessera-package"></span><h1>testessera package<a class="headerlink" href="#module-testessera" title="Link to this heading"></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="testessera.VERSION">
+<span class="sig-prename descclassname"><span class="pre">testessera.</span></span><span class="sig-name descname"><span class="pre">VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.0.1'</span></em><a class="headerlink" href="#testessera.VERSION" title="Link to this definition"></a></dt>
+<dd><p>Testessera package version.</p>
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-testessera.generator">
+<span id="testessera-generator-module"></span><h2>testessera.generator module<a class="headerlink" href="#module-testessera.generator" title="Link to this heading"></a></h2>
+<p>This module provides functions that return realistic test data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.delta_ago_zulu_str">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">delta_ago_zulu_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#delta_ago_zulu_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.delta_ago_zulu_str" title="Link to this definition"></a></dt>
+<dd><p>E.g. 2023-09-20T10:30:00Z</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.mac_address">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">mac_address</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#mac_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.mac_address" title="Link to this definition"></a></dt>
+<dd><p>E.g. 10:66:61:0E:3F:C1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.person_full_name">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">person_full_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#person_full_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.person_full_name" title="Link to this definition"></a></dt>
+<dd><p>E.g. Isaiah Morgan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.person_name">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">person_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#person_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.person_name" title="Link to this definition"></a></dt>
+<dd><p>E.g. Isaiah</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.phone_number">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">phone_number</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#phone_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.phone_number" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.generator.utc_now_zulu_str">
+<span class="sig-prename descclassname"><span class="pre">testessera.generator.</span></span><span class="sig-name descname"><span class="pre">utc_now_zulu_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/generator.html#utc_now_zulu_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.generator.utc_now_zulu_str" title="Link to this definition"></a></dt>
+<dd><p>E.g. 2023-09-20T10:30:00Z</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-testessera.json">
+<span id="testessera-json-module"></span><h2>testessera.json module<a class="headerlink" href="#module-testessera.json" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.json.assert_json">
+<span class="sig-prename descclassname"><span class="pre">testessera.json.</span></span><span class="sig-name descname"><span class="pre">assert_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/json.html#assert_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.json.assert_json" title="Link to this definition"></a></dt>
+<dd><p>Validates a JSON instance against a expected JSON instance or schema.</p>
+<p>If <cite>expected_instance</cite> is provided, a direct comparison is made.</p>
+<p>If <cite>expected_schema</cite> is provided, the function utilizes <cite>jsonschema</cite> to validate the
+JSON instance against it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<em>dict</em><em> or </em><em>list</em>) – The JSON instance to be asserted.</p></li>
+<li><p><strong>expected_instance</strong> (<em>dict</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – The expected JSON instance
+for direct comparison.</p></li>
+<li><p><strong>expected_schema</strong> (<em>dict</em><em>, </em><em>optional</em>) – The JSON schema to validate the instance
+against.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – The JSON instance doesn’t match the expected instance or schema.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>..sourcecode</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Schema-based validation</span>
+<span class="n">assert_json</span><span class="p">(</span>
+        <span class="n">json_data</span><span class="p">,</span>
+        <span class="n">expected_schema</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                        <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-testessera.kafka">
+<span id="testessera-kafka-module"></span><h2>testessera.kafka module<a class="headerlink" href="#module-testessera.kafka" title="Link to this heading"></a></h2>
+<p>Testessera Kafka related classes and functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">testessera.kafka.</span></span><span class="sig-name descname"><span class="pre">KafkaConsumer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_servers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaConsumer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaConsumer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Kafka consumer for testing environments.</p>
+<p>It encapsulates a Kafka consumer using the <cite>confluent_kafka</cite> library. It allows
+for the consumption and processing of Kafka messages from specified topics.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer.consumer">
+<span class="sig-name descname"><span class="pre">consumer</span></span><a class="headerlink" href="#testessera.kafka.KafkaConsumer.consumer" title="Link to this definition"></a></dt>
+<dd><p><cite>confluent_kafka.Consumer</cite> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Consumer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer._topic_queue_mapping">
+<span class="sig-name descname"><span class="pre">_topic_queue_mapping</span></span><a class="headerlink" href="#testessera.kafka.KafkaConsumer._topic_queue_mapping" title="Link to this definition"></a></dt>
+<dd><p>Mapping of topic names to queues for
+consuming and processing messages, if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaConsumer.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaConsumer.close" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer.consume_many">
+<span class="sig-name descname"><span class="pre">consume_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaConsumer.consume_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaConsumer.consume_many" title="Link to this definition"></a></dt>
+<dd><p>Consume and process multiple Kafka messages.</p>
+<p>If the requested number of messages are successfully consumed within
+the timeout, they are returned in a deque. If fewer messages are available before the
+timeout expires, the method returns all available messages.</p>
+<p>If the <cite>_topic_queue_mapping</cite> attribute is provided during initialization,
+the consumed messages will be added to their respective topic-specific queues
+in the <cite>_topic_queue_mapping</cite>. This is useful for scenarios where messages need
+to be processed in a separate queue for each topic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">deque</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>num_messages</strong> (<em>int</em>) – The maximum number of messages to consume and process.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum time (in seconds) to wait for messages.
+Defaults to 2.0 seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A deque containing the consumed Kafka messages. The deque may</dt><dd><p>contain fewer messages if the timeout expires before the requested number
+of messages are received.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>deque[Message]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer.consume_one">
+<span class="sig-name descname"><span class="pre">consume_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaConsumer.consume_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaConsumer.consume_one" title="Link to this definition"></a></dt>
+<dd><p>Consumes and processes a Kafka message.</p>
+<p>It consumes a single Kafka message and process it. If a message
+is successfully consumed within the given timeout, it is returned. If no message is
+received within the timeout, None is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum time (in seconds) to wait for a
+message. Defaults to 2.0 seconds.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The consumed Kafka message if available, or None if no message</dt><dd><p>was received within the timeout.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional[Message]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaConsumer.subscribe">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaConsumer.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaConsumer.subscribe" title="Link to this definition"></a></dt>
+<dd><p>Subscribes to <cite>topics</cite> and waits for partition assignment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>topics</strong> – List of topic names to subscribe to, or mapping of topic names to
+queues for consumption. If a mapping of topic names to queues is
+provided, the consumer’s received messages are added to their
+respective queues for separate processing.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KafkaException</strong> – </p></li>
+<li><p><strong>RuntimeError    If called on a closed consumer.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaProducer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">testessera.kafka.</span></span><span class="sig-name descname"><span class="pre">KafkaProducer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bootstrap_servers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaProducer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaProducer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.kafka.KafkaProducer.produce">
+<span class="sig-name descname"><span class="pre">produce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#KafkaProducer.produce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.KafkaProducer.produce" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BufferError</strong> – </p></li>
+<li><p><strong>KafkaException</strong> – </p></li>
+<li><p><strong>NotImplementedError</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.kafka.assert_kafka_message">
+<span class="sig-prename descclassname"><span class="pre">testessera.kafka.</span></span><span class="sig-name descname"><span class="pre">assert_kafka_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_json_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_json_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#assert_kafka_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.assert_kafka_message" title="Link to this definition"></a></dt>
+<dd><p>Asserts the contents of a JSON message consumed from Kafka.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>Message</em>) – </p></li>
+<li><p><strong>expected_json_instance</strong> (<em>dict</em><em>, </em><em>optional</em>) – The expected JSON instance to compare with.</p></li>
+<li><p><strong>expected_json_schema</strong> (<em>dict</em><em>, </em><em>optional</em>) – The expected JSON schema to validate with.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments to compare
+specific property values. Property names should be provided as keys, and
+expected values as values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError          The assertion failed.</strong> – </p></li>
+<li><p><strong>JSONDecodeError         Error decoding the JSON content</strong><strong> of </strong><strong>the message.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.kafka.assert_no_kafka_message">
+<span class="sig-prename descclassname"><span class="pre">testessera.kafka.</span></span><span class="sig-name descname"><span class="pre">assert_no_kafka_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/kafka.html#assert_no_kafka_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.kafka.assert_no_kafka_message" title="Link to this definition"></a></dt>
+<dd><p>Asserts no message was consumed from Kafka.</p>
+</dd></dl>
+
+</section>
+<section id="module-testessera.rest">
+<span id="testessera-rest-module"></span><h2>testessera.rest module<a class="headerlink" href="#module-testessera.rest" title="Link to this heading"></a></h2>
+<p>Testessera REST related classes and functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="testessera.rest.RestClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">RestClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#RestClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.RestClient" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.rest.RestClient._base_url">
+<span class="sig-name descname"><span class="pre">_base_url</span></span><a class="headerlink" href="#testessera.rest.RestClient._base_url" title="Link to this definition"></a></dt>
+<dd><p>REST API base url. E.g. <cite>https://api.thecatapi.com/v1</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.rest.RestClient._api_key">
+<span class="sig-name descname"><span class="pre">_api_key</span></span><a class="headerlink" href="#testessera.rest.RestClient._api_key" title="Link to this definition"></a></dt>
+<dd><p>API key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.rest.RestClient._timeout">
+<span class="sig-name descname"><span class="pre">_timeout</span></span><a class="headerlink" href="#testessera.rest.RestClient._timeout" title="Link to this definition"></a></dt>
+<dd><p>Timeout passed into <cite>requests</cite> module at every request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.rest.RestClient._verify">
+<span class="sig-name descname"><span class="pre">_verify</span></span><a class="headerlink" href="#testessera.rest.RestClient._verify" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="testessera.rest.RestClient._session">
+<span class="sig-name descname"><span class="pre">_session</span></span><a class="headerlink" href="#testessera.rest.RestClient._session" title="Link to this definition"></a></dt>
+<dd><p>Underlaying <cite>requests.Session</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>requests.Session</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="testessera.rest.RestClient.request">
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rest_request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#RestClient.request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.RestClient.request" title="Link to this definition"></a></dt>
+<dd><p>The effective request URL is compose by combining the <cite>_base_url</cite> attribute with
+<cite>RestRequest.path</cite> and <cite>RestRequest.query_params</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code></span></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>requests.RequestException</strong> – </p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Consider using Request params instead of _build_url()</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">RestRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#RestRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.RestRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest.body">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">body</span></span><a class="headerlink" href="#testessera.rest.RestRequest.body" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest.headers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#testessera.rest.RestRequest.headers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest.method">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#testessera.rest.RestRequest.method" title="Link to this definition"></a></dt>
+<dd><p>HTTP method; usually POST, PUT, PATCH or DELETE.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest.path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#testessera.rest.RestRequest.path" title="Link to this definition"></a></dt>
+<dd><p>Request URL path.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="testessera.rest.RestRequest.query_params">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">query_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#testessera.rest.RestRequest.query_params" title="Link to this definition"></a></dt>
+<dd><p>Request URL query parameters.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="testessera.rest.SUCCESS_2XX">
+<span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">SUCCESS_2XX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#testessera.rest.SUCCESS_2XX" title="Link to this definition"></a></dt>
+<dd><p>Used to specify any successful HTTP status code in <cite>assert_rest_response()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.rest.assert_http_response">
+<span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">assert_http_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#assert_http_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.assert_http_response" title="Link to this definition"></a></dt>
+<dd><p>Asserts an HTTP response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>requests.Response</em>) – Response object.</p></li>
+<li><p><strong>status_code</strong> (<em>int</em>) – Expected status code.</p></li>
+<li><p><strong>headers</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Expected headers.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.rest.assert_problem_json_response">
+<span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">assert_problem_json_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#assert_problem_json_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.assert_problem_json_response" title="Link to this definition"></a></dt>
+<dd><p>Asserts RFC9457 compliant error JSON responses.</p>
+<p>RFC9457 defines a “problem detail” to carry machine-readable details of errors in HTTP
+response content to avoid the need to define new error response formats for HTTP APIs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status_code</strong> (<em>int</em>) – Expected status code.</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – Expected type.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Expected title.</p></li>
+<li><p><strong>detail</strong> (<em>str</em>) – Expected detail.</p></li>
+<li><p><strong>instance</strong> (<em>str</em>) – Expected instance.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span> <span class="mi">404</span> <span class="n">Not</span> <span class="n">Found</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">problem</span><span class="o">+</span><span class="n">json</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Language</span><span class="p">:</span> <span class="n">en</span>
+
+<span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;https://bookstore.example.com/problems/book-not-found&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Book Not Found&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="mi">404</span><span class="p">,</span>
+        <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The book with ID 12345 could not be found in our database.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;instance&quot;</span><span class="p">:</span> <span class="s2">&quot;/api/books/12345&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2023-11-28T12:34:56Z&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;custom-field&quot;</span><span class="p">:</span> <span class="s2">&quot;Additional information or context here&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>RFC9457 “Problem Details for HTTP APIs” <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9457">https://www.rfc-editor.org/rfc/rfc9457</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="testessera.rest.assert_rest_response">
+<span class="sig-prename descclassname"><span class="pre">testessera.rest.</span></span><span class="sig-name descname"><span class="pre">assert_rest_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testessera/rest.html#assert_rest_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#testessera.rest.assert_rest_response" title="Link to this definition"></a></dt>
+<dd><p>Asserts a REST response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>requests.Response</em>) – Request response.</p></li>
+<li><p><strong>status_code</strong> (<em>int</em>) – Expected status code.</p></li>
+<li><p><strong>headers</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Expected headers.</p></li>
+<li><p><strong>json_instance</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Expected JSON instance.</p></li>
+<li><p><strong>json_schema</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – Expected JSON schema.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, David D..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

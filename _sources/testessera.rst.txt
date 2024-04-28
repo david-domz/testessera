@@ -1,6 +1,11 @@
 testessera package
 ==================
 
+.. automodule:: testessera
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -28,26 +33,10 @@ testessera.kafka module
    :undoc-members:
    :show-inheritance:
 
-testessera.redis module
------------------------
-
-.. automodule:: testessera.redis
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 testessera.rest module
 ----------------------
 
 .. automodule:: testessera.rest
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: testessera
    :members:
    :undoc-members:
    :show-inheritance:

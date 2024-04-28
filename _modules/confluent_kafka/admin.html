@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>confluent_kafka.admin &mdash; Testessera 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Testessera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference - Code API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../testessera.html">testessera package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Testessera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">confluent_kafka.admin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for confluent_kafka.admin</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022 Confluent Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1"># http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Kafka admin client: create, view, alter, and delete topics and resources.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span>
+
+<span class="c1"># Unused imports are keeped to be accessible using this public module</span>
+<span class="kn">from</span> <span class="nn">._config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ConfigSource</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                      <span class="n">ConfigEntry</span><span class="p">,</span>
+                      <span class="n">ConfigResource</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._resource</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ResourceType</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                        <span class="n">ResourcePatternType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._acl</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AclOperation</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                   <span class="n">AclPermissionType</span><span class="p">,</span>
+                   <span class="n">AclBinding</span><span class="p">,</span>
+                   <span class="n">AclBindingFilter</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._metadata</span> <span class="kn">import</span> <span class="p">(</span><span class="n">BrokerMetadata</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                        <span class="n">ClusterMetadata</span><span class="p">,</span>
+                        <span class="n">GroupMember</span><span class="p">,</span>
+                        <span class="n">GroupMetadata</span><span class="p">,</span>
+                        <span class="n">PartitionMetadata</span><span class="p">,</span>
+                        <span class="n">TopicMetadata</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._group</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ConsumerGroupListing</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                     <span class="n">ListConsumerGroupsResult</span><span class="p">,</span>
+                     <span class="n">ConsumerGroupDescription</span><span class="p">,</span>
+                     <span class="n">MemberAssignment</span><span class="p">,</span>
+                     <span class="n">MemberDescription</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..cimpl</span> <span class="kn">import</span> <span class="p">(</span><span class="n">KafkaException</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
+                     <span class="n">KafkaError</span><span class="p">,</span>
+                     <span class="n">_AdminClientImpl</span><span class="p">,</span>
+                     <span class="n">NewTopic</span><span class="p">,</span>
+                     <span class="n">NewPartitions</span><span class="p">,</span>
+                     <span class="n">TopicPartition</span> <span class="k">as</span> <span class="n">_TopicPartition</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_UNKNOWN_CONFIG</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_DYNAMIC_TOPIC_CONFIG</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_DYNAMIC_BROKER_CONFIG</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_DYNAMIC_DEFAULT_BROKER_CONFIG</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_STATIC_BROKER_CONFIG</span><span class="p">,</span>
+                     <span class="n">CONFIG_SOURCE_DEFAULT_CONFIG</span><span class="p">,</span>
+                     <span class="n">RESOURCE_UNKNOWN</span><span class="p">,</span>
+                     <span class="n">RESOURCE_ANY</span><span class="p">,</span>
+                     <span class="n">RESOURCE_TOPIC</span><span class="p">,</span>
+                     <span class="n">RESOURCE_GROUP</span><span class="p">,</span>
+                     <span class="n">RESOURCE_BROKER</span><span class="p">,</span>
+                     <span class="n">OFFSET_INVALID</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">confluent_kafka</span> <span class="kn">import</span> <span class="n">ConsumerGroupTopicPartitions</span> \
+    <span class="k">as</span> <span class="n">_ConsumerGroupTopicPartitions</span>
+
+<span class="kn">from</span> <span class="nn">confluent_kafka</span> <span class="kn">import</span> <span class="n">ConsumerGroupState</span> \
+    <span class="k">as</span> <span class="n">_ConsumerGroupState</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">string_type</span> <span class="o">=</span> <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">string_type</span> <span class="o">=</span> <span class="nb">str</span>
+
+
+<div class="viewcode-block" id="AdminClient">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient">[docs]</a>
+<span class="k">class</span> <span class="nc">AdminClient</span> <span class="p">(</span><span class="n">_AdminClientImpl</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    AdminClient provides admin operations for Kafka brokers, topics, groups,</span>
+<span class="sd">    and other resource types supported by the broker.</span>
+
+<span class="sd">    The Admin API methods are asynchronous and return a dict of</span>
+<span class="sd">    concurrent.futures.Future objects keyed by the entity.</span>
+<span class="sd">    The entity is a topic name for create_topics(), delete_topics(), create_partitions(),</span>
+<span class="sd">    and a ConfigResource for alter_configs() and describe_configs().</span>
+
+<span class="sd">    All the futures for a single API call will currently finish/fail at</span>
+<span class="sd">    the same time (backed by the same protocol request), but this might</span>
+<span class="sd">    change in future versions of the client.</span>
+
+<span class="sd">    See examples/adminapi.py for example usage.</span>
+
+<span class="sd">    For more information see the `Java Admin API documentation</span>
+<span class="sd">    &lt;https://docs.confluent.io/current/clients/javadocs/org/apache/kafka/clients/admin/package-frame.html&gt;`_.</span>
+
+<span class="sd">    Requires broker version v0.11.0.0 or later.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new AdminClient using the provided configuration dictionary.</span>
+
+<span class="sd">        The AdminClient is a standard Kafka protocol client, supporting</span>
+<span class="sd">        the standard librdkafka configuration properties as specified at</span>
+<span class="sd">        https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md</span>
+
+<span class="sd">        At least &#39;bootstrap.servers&#39; should be configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_topics_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map per-topic results to per-topic futures in futmap.</span>
+<span class="sd">        The result value of each (successful) future is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">topic</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">futmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Topic </span><span class="si">{}</span><span class="s2"> not found in future-map: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">futmap</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Topic-level exception</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">KafkaException</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Topic-level success</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Request-level exception, raise the same for all topics</span>
+            <span class="k">for</span> <span class="n">topic</span><span class="p">,</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">futmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_resource_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map per-resource results to per-resource futures in futmap.</span>
+<span class="sd">        The result value of each (successful) future is a ConfigResource.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">resource</span><span class="p">,</span> <span class="n">configs</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">futmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Resource </span><span class="si">{}</span><span class="s2"> not found in future-map: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">futmap</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Resource-level exception</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">KafkaException</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Resource-level success</span>
+                    <span class="c1"># configs will be a dict for describe_configs()</span>
+                    <span class="c1"># and None for alter_configs()</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Request-level exception, raise the same for all resources</span>
+            <span class="k">for</span> <span class="n">resource</span><span class="p">,</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">futmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_list_consumer_groups_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_consumer_groups_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map per-group results to per-group futures in futmap.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="n">futmap_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">futmap</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">len_results</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">len_futures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">futmap_values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">len_results</span> <span class="o">!=</span> <span class="n">len_futures</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Results length </span><span class="si">{}</span><span class="s2"> is different from future-map length </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_results</span><span class="p">,</span> <span class="n">len_futures</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">futmap_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">KafkaError</span><span class="p">):</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">KafkaException</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Request-level exception, raise the same for all groups</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">futmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_consumer_group_offsets_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map per-group results to per-group futures in futmap.</span>
+<span class="sd">        The result value of each (successful) future is ConsumerGroupTopicPartitions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="n">futmap_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">futmap</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">len_results</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">len_futures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">futmap_values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">len_results</span> <span class="o">!=</span> <span class="n">len_futures</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Results length </span><span class="si">{}</span><span class="s2"> is different from future-map length </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_results</span><span class="p">,</span> <span class="n">len_futures</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">futmap_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">KafkaError</span><span class="p">):</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">KafkaException</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Request-level exception, raise the same for all groups</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">futmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_acls_result</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map create ACL binding results to corresponding futures in futmap.</span>
+<span class="sd">        For create_acls the result value of each (successful) future is None.</span>
+<span class="sd">        For delete_acls the result value of each (successful) future is the list of deleted AclBindings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="n">futmap_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">futmap</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">len_results</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">len_futures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">futmap_values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">len_results</span> <span class="o">!=</span> <span class="n">len_futures</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Results length </span><span class="si">{}</span><span class="s2"> is different from future-map length </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_results</span><span class="p">,</span> <span class="n">len_futures</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">futmap_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">KafkaError</span><span class="p">):</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">KafkaException</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Request-level exception, raise the same for all the AclBindings or AclBindingFilters</span>
+            <span class="k">for</span> <span class="n">resource</span><span class="p">,</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">futmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_create_future</span><span class="p">():</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">Future</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">set_running_or_notify_cancel</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Future was cancelled prematurely&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_futures</span><span class="p">(</span><span class="n">futmap_keys</span><span class="p">,</span> <span class="n">class_check</span><span class="p">,</span> <span class="n">make_result_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create futures and a futuremap for the keys in futmap_keys,</span>
+<span class="sd">        and create a request-level future to be bassed to the C API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">futmap</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">futmap_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">class_check</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">class_check</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected list of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">class_check</span><span class="p">)))</span>
+            <span class="n">futmap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_create_future</span><span class="p">()</span>
+
+        <span class="c1"># Create an internal future for the entire request,</span>
+        <span class="c1"># this future will trigger _make_..._result() and set result/exception</span>
+        <span class="c1"># per topic,future in futmap.</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_create_future</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">make_result_fn</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">futmap</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_has_duplicates</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">items</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_list_consumer_group_offsets_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request cannot be None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request must be a list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Currently we support listing offsets for a single consumer group only&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">request</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">_ConsumerGroupTopicPartitions</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected list of &#39;ConsumerGroupTopicPartitions&#39;&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">group_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; cannot be None&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">group_id</span><span class="p">,</span> <span class="n">string_type</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; must be a string&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">req</span><span class="o">.</span><span class="n">group_id</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; cannot be empty&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;topic_partitions&#39; must be a list or None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;topic_partitions&#39; cannot be empty&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">topic_partition</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">topic_partition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; cannot be None&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">topic_partition</span><span class="p">,</span> <span class="n">_TopicPartition</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must be of type TopicPartition&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">topic</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have &#39;topic&#39; attribute as None&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">topic</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have &#39;topic&#39; attribute as Empty&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">partition</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have negative &#39;partition&#39; value&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="n">OFFSET_INVALID</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">topic_partition</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have &#39;offset&#39; value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_alter_consumer_group_offsets_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request cannot be None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request must be a list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Currently we support altering offsets for a single consumer group only&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">request</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">_ConsumerGroupTopicPartitions</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected list of &#39;ConsumerGroupTopicPartitions&#39;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">group_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; cannot be None&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">group_id</span><span class="p">,</span> <span class="n">string_type</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; must be a string&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">req</span><span class="o">.</span><span class="n">group_id</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;group_id&#39; cannot be empty&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;topic_partitions&#39; cannot be null&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;topic_partitions&#39; must be a list&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;topic_partitions&#39; cannot be empty&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">topic_partition</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">topic_partitions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">topic_partition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; cannot be None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">topic_partition</span><span class="p">,</span> <span class="n">_TopicPartition</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must be of type TopicPartition&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">topic</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have &#39;topic&#39; attribute as None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">topic</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have &#39;topic&#39; attribute as Empty&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">partition</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have negative value for &#39;partition&#39; field&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">topic_partition</span><span class="o">.</span><span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Element of &#39;topic_partitions&#39; must not have negative value for &#39;offset&#39; field&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AdminClient.create_topics">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.create_topics">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_topics</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create one or more new topics.</span>
+
+<span class="sd">        :param list(NewTopic) new_topics: A list of specifictions (NewTopic) for</span>
+<span class="sd">                  the topics that should be created.</span>
+<span class="sd">        :param float operation_timeout: The operation timeout in seconds,</span>
+<span class="sd">                  controlling how long the CreateTopics request will block</span>
+<span class="sd">                  on the broker waiting for the topic creation to propagate</span>
+<span class="sd">                  in the cluster. A value of 0 returns immediately. Default: 0</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+<span class="sd">        :param bool validate_only: If true, the request is only validated</span>
+<span class="sd">                  without creating the topic. Default: False</span>
+
+<span class="sd">        :returns: A dict of futures for each topic, keyed by the topic name.</span>
+<span class="sd">                  The future result() method returns None.</span>
+
+<span class="sd">        :rtype: dict(&lt;topic_name, future&gt;)</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">topic</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_topics</span><span class="p">],</span>
+                                              <span class="kc">None</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_topics_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_topics</span><span class="p">(</span><span class="n">new_topics</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.delete_topics">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.delete_topics">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topics</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete one or more topics.</span>
+
+<span class="sd">        :param list(str) topics: A list of topics to mark for deletion.</span>
+<span class="sd">        :param float operation_timeout: The operation timeout in seconds,</span>
+<span class="sd">                  controlling how long the DeleteTopics request will block</span>
+<span class="sd">                  on the broker waiting for the topic deletion to propagate</span>
+<span class="sd">                  in the cluster. A value of 0 returns immediately. Default: 0</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each topic, keyed by the topic name.</span>
+<span class="sd">                  The future result() method returns None.</span>
+
+<span class="sd">        :rtype: dict(&lt;topic_name, future&gt;)</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">topics</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_topics_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete_topics</span><span class="p">(</span><span class="n">topics</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.list_topics">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.list_topics">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">list_topics</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.list_groups">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.list_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">list_groups</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.create_partitions">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.create_partitions">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_partitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_partitions</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create additional partitions for the given topics.</span>
+
+<span class="sd">        :param list(NewPartitions) new_partitions: New partitions to be created.</span>
+<span class="sd">        :param float operation_timeout: The operation timeout in seconds,</span>
+<span class="sd">                  controlling how long the CreatePartitions request will block</span>
+<span class="sd">                  on the broker waiting for the partition creation to propagate</span>
+<span class="sd">                  in the cluster. A value of 0 returns immediately. Default: 0</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+<span class="sd">        :param bool validate_only: If true, the request is only validated</span>
+<span class="sd">                  without creating the partitions. Default: False</span>
+
+<span class="sd">        :returns: A dict of futures for each topic, keyed by the topic name.</span>
+<span class="sd">                  The future result() method returns None.</span>
+
+<span class="sd">        :rtype: dict(&lt;topic_name, future&gt;)</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">topic</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_partitions</span><span class="p">],</span>
+                                              <span class="kc">None</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_topics_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_partitions</span><span class="p">(</span><span class="n">new_partitions</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.describe_configs">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.describe_configs">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the configuration of the specified resources.</span>
+
+<span class="sd">        :warning: Multiple resources and resource types may be requested,</span>
+<span class="sd">                  but at most one resource of type RESOURCE_BROKER is allowed</span>
+<span class="sd">                  per call since these resource requests must be sent to the</span>
+<span class="sd">                  broker specified in the resource.</span>
+
+<span class="sd">        :param list(ConfigResource) resources: Resources to get the configuration for.</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each resource, keyed by the ConfigResource.</span>
+<span class="sd">                  The type of the value returned by the future result() method is</span>
+<span class="sd">                  dict(&lt;configname, ConfigEntry&gt;).</span>
+
+<span class="sd">        :rtype: dict(&lt;ConfigResource, future&gt;)</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">ConfigResource</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_resource_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">describe_configs</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.alter_configs">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.alter_configs">[docs]</a>
+    <span class="k">def</span> <span class="nf">alter_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update configuration properties for the specified resources.</span>
+<span class="sd">        Updates are not transactional so they may succeed for a subset</span>
+<span class="sd">        of the provided resources while the others fail.</span>
+<span class="sd">        The configuration for a particular resource is updated atomically,</span>
+<span class="sd">        replacing the specified values while reverting unspecified configuration</span>
+<span class="sd">        entries to their default values.</span>
+
+<span class="sd">        :warning: alter_configs() will replace all existing configuration for</span>
+<span class="sd">                  the provided resources with the new configuration given,</span>
+<span class="sd">                  reverting all other configuration for the resource back</span>
+<span class="sd">                  to their default values.</span>
+
+<span class="sd">        :warning: Multiple resources and resource types may be specified,</span>
+<span class="sd">                  but at most one resource of type RESOURCE_BROKER is allowed</span>
+<span class="sd">                  per call since these resource requests must be sent to the</span>
+<span class="sd">                  broker specified in the resource.</span>
+
+<span class="sd">        :param list(ConfigResource) resources: Resources to update configuration of.</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`.</span>
+<span class="sd">        :param bool validate_only: If true, the request is validated only,</span>
+<span class="sd">                  without altering the configuration. Default: False</span>
+
+<span class="sd">        :returns: A dict of futures for each resource, keyed by the ConfigResource.</span>
+<span class="sd">                  The future result() method returns None.</span>
+
+<span class="sd">        :rtype: dict(&lt;ConfigResource, future&gt;)</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">ConfigResource</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_resource_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">alter_configs</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.create_acls">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.create_acls">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_acls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create one or more ACL bindings.</span>
+
+<span class="sd">        :param list(AclBinding) acls: A list of unique ACL binding specifications (:class:`.AclBinding`)</span>
+<span class="sd">                         to create.</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each ACL binding, keyed by the :class:`AclBinding` object.</span>
+<span class="sd">                  The future result() method returns None on success.</span>
+
+<span class="sd">        :rtype: dict[AclBinding, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_has_duplicates</span><span class="p">(</span><span class="n">acls</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duplicate ACL bindings not allowed&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">acls</span><span class="p">,</span> <span class="n">AclBinding</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_acls_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_acls</span><span class="p">(</span><span class="n">acls</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.describe_acls">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.describe_acls">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_acls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acl_binding_filter</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Match ACL bindings by filter.</span>
+
+<span class="sd">        :param AclBindingFilter acl_binding_filter: a filter with attributes that</span>
+<span class="sd">                  must match.</span>
+<span class="sd">                  String attributes match exact values or any string if set to None.</span>
+<span class="sd">                  Enums attributes match exact values or any value if equal to `ANY`.</span>
+<span class="sd">                  If :class:`ResourcePatternType` is set to :attr:`ResourcePatternType.MATCH`</span>
+<span class="sd">                  returns ACL bindings with:</span>
+<span class="sd">                  :attr:`ResourcePatternType.LITERAL` pattern type with resource name equal</span>
+<span class="sd">                  to the given resource name;</span>
+<span class="sd">                  :attr:`ResourcePatternType.LITERAL` pattern type with wildcard resource name</span>
+<span class="sd">                  that matches the given resource name;</span>
+<span class="sd">                  :attr:`ResourcePatternType.PREFIXED` pattern type with resource name</span>
+<span class="sd">                  that is a prefix of the given resource name</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A future returning a list(:class:`AclBinding`) as result</span>
+
+<span class="sd">        :rtype: future</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_create_future</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">describe_acls</span><span class="p">(</span><span class="n">acl_binding_filter</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.delete_acls">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.delete_acls">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_acls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acl_binding_filters</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete ACL bindings matching one or more ACL binding filters.</span>
+
+<span class="sd">        :param list(AclBindingFilter) acl_binding_filters: a list of unique ACL binding filters</span>
+<span class="sd">                  to match ACLs to delete.</span>
+<span class="sd">                  String attributes match exact values or any string if set to None.</span>
+<span class="sd">                  Enums attributes match exact values or any value if equal to `ANY`.</span>
+<span class="sd">                  If :class:`ResourcePatternType` is set to :attr:`ResourcePatternType.MATCH`</span>
+<span class="sd">                  deletes ACL bindings with:</span>
+<span class="sd">                  :attr:`ResourcePatternType.LITERAL` pattern type with resource name</span>
+<span class="sd">                  equal to the given resource name;</span>
+<span class="sd">                  :attr:`ResourcePatternType.LITERAL` pattern type with wildcard resource name</span>
+<span class="sd">                  that matches the given resource name;</span>
+<span class="sd">                  :attr:`ResourcePatternType.PREFIXED` pattern type with resource name</span>
+<span class="sd">                  that is a prefix of the given resource name</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each ACL binding filter, keyed by the :class:`AclBindingFilter` object.</span>
+<span class="sd">                  The future result() method returns a list of :class:`AclBinding`.</span>
+
+<span class="sd">        :rtype: dict[AclBindingFilter, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_has_duplicates</span><span class="p">(</span><span class="n">acl_binding_filters</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duplicate ACL binding filters not allowed&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">acl_binding_filters</span><span class="p">,</span> <span class="n">AclBindingFilter</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_acls_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete_acls</span><span class="p">(</span><span class="n">acl_binding_filters</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.list_consumer_groups">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.list_consumer_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_consumer_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List consumer groups.</span>
+
+<span class="sd">        :param float request_timeout: Maximum response time before timing out, or -1 for infinite timeout.</span>
+<span class="sd">                  Default: `socket.timeout.ms*1000.0`</span>
+<span class="sd">        :param set(ConsumerGroupState) states: only list consumer groups which are currently in</span>
+<span class="sd">                  these states.</span>
+
+<span class="sd">        :returns: a future. Result method of the future returns :class:`ListConsumerGroupsResult`.</span>
+
+<span class="sd">        :rtype: future</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;states&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;states&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;states&#39; must be a set&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">_ConsumerGroupState</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All elements of states must be of type ConsumerGroupState&quot;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;states_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">]</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;states&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">([],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_list_consumer_groups_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">list_consumer_groups</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.describe_consumer_groups">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.describe_consumer_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_consumer_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_ids</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Describe consumer groups.</span>
+
+<span class="sd">        :param list(str) group_ids: List of group_ids which need to be described.</span>
+<span class="sd">        :param float request_timeout: Maximum response time before timing out, or -1 for infinite timeout.</span>
+<span class="sd">                  Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each group, keyed by the group_id.</span>
+<span class="sd">                  The future result() method returns :class:`ConsumerGroupDescription`.</span>
+
+<span class="sd">        :rtype: dict[str, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected input to be list of group ids to be described&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected at least one group to be described&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_consumer_groups_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">describe_consumer_groups</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.delete_consumer_groups">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.delete_consumer_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_consumer_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_ids</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the given consumer groups.</span>
+
+<span class="sd">        :param list(str) group_ids: List of group_ids which need to be deleted.</span>
+<span class="sd">        :param float request_timeout: Maximum response time before timing out, or -1 for infinite timeout.</span>
+<span class="sd">                  Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each group, keyed by the group_id.</span>
+<span class="sd">                  The future result() method returns None.</span>
+
+<span class="sd">        :rtype: dict[str, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected input to be list of group ids to be deleted&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected at least one group to be deleted&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="n">string_type</span><span class="p">,</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_consumer_groups_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete_consumer_groups</span><span class="p">(</span><span class="n">group_ids</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.list_consumer_group_offsets">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.list_consumer_group_offsets">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_consumer_group_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_consumer_group_offsets_request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List offset information for the consumer group and (optional) topic partition provided in the request.</span>
+
+<span class="sd">        :note: Currently, the API supports only a single group.</span>
+
+<span class="sd">        :param list(ConsumerGroupTopicPartitions) list_consumer_group_offsets_request: List of</span>
+<span class="sd">                    :class:`ConsumerGroupTopicPartitions` which consist of group name and topic</span>
+<span class="sd">                    partition information for which offset detail is expected. If only group name is</span>
+<span class="sd">                    provided, then offset information of all the topic and partition associated with</span>
+<span class="sd">                    that group is returned.</span>
+<span class="sd">        :param bool require_stable: If True, fetches stable offsets. Default: False</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each group, keyed by the group id.</span>
+<span class="sd">                  The future result() method returns :class:`ConsumerGroupTopicPartitions`.</span>
+
+<span class="sd">        :rtype: dict[str, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AdminClient</span><span class="o">.</span><span class="n">_check_list_consumer_group_offsets_request</span><span class="p">(</span><span class="n">list_consumer_group_offsets_request</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">([</span><span class="n">request</span><span class="o">.</span><span class="n">group_id</span> <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">list_consumer_group_offsets_request</span><span class="p">],</span>
+                                              <span class="n">string_type</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_consumer_group_offsets_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">list_consumer_group_offsets</span><span class="p">(</span><span class="n">list_consumer_group_offsets_request</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+
+
+<div class="viewcode-block" id="AdminClient.alter_consumer_group_offsets">
+<a class="viewcode-back" href="../../index.html#confluent_kafka.admin.AdminClient.alter_consumer_group_offsets">[docs]</a>
+    <span class="k">def</span> <span class="nf">alter_consumer_group_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alter_consumer_group_offsets_request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Alter offset for the consumer group and topic partition provided in the request.</span>
+
+<span class="sd">        :note: Currently, the API supports only a single group.</span>
+
+<span class="sd">        :param list(ConsumerGroupTopicPartitions) alter_consumer_group_offsets_request: List of</span>
+<span class="sd">                    :class:`ConsumerGroupTopicPartitions` which consist of group name and topic</span>
+<span class="sd">                    partition; and corresponding offset to be updated.</span>
+<span class="sd">        :param float request_timeout: The overall request timeout in seconds,</span>
+<span class="sd">                  including broker lookup, request transmission, operation time</span>
+<span class="sd">                  on broker, and response. Default: `socket.timeout.ms*1000.0`</span>
+
+<span class="sd">        :returns: A dict of futures for each group, keyed by the group id.</span>
+<span class="sd">                  The future result() method returns :class:`ConsumerGroupTopicPartitions`.</span>
+
+<span class="sd">        :rtype: dict[ConsumerGroupTopicPartitions, future]</span>
+
+<span class="sd">        :raises KafkaException: Operation failed locally or on broker.</span>
+<span class="sd">        :raises TypeException: Invalid input.</span>
+<span class="sd">        :raises ValueException: Invalid input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AdminClient</span><span class="o">.</span><span class="n">_check_alter_consumer_group_offsets_request</span><span class="p">(</span><span class="n">alter_consumer_group_offsets_request</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">futmap</span> <span class="o">=</span> <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_futures</span><span class="p">([</span><span class="n">request</span><span class="o">.</span><span class="n">group_id</span> <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">alter_consumer_group_offsets_request</span><span class="p">],</span>
+                                              <span class="n">string_type</span><span class="p">,</span>
+                                              <span class="n">AdminClient</span><span class="o">.</span><span class="n">_make_consumer_group_offsets_result</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">alter_consumer_group_offsets</span><span class="p">(</span><span class="n">alter_consumer_group_offsets_request</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">futmap</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, David D..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

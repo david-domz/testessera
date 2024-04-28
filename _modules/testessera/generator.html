@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>testessera.generator &mdash; Testessera 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Testessera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference - Code API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../testessera.html">testessera package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Testessera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">testessera.generator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for testessera.generator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides functions that return realistic test data.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<span class="n">_ZULU_TIME_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
+
+<span class="n">_PERSON_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+	<span class="s2">&quot;Liam&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Emma&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Noah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Olivia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;William&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ava&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;James&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Isabella&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Oliver&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Sophia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Benjamin&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Elijah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Charlotte&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lucas&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Amelia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mason&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Harper&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Logan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Evelyn&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Alexander&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Abigail&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ethan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Emily&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Daniel&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Madison&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Aiden&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Scarlett&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Matthew&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Elizabeth&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Joseph&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Grace&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Samuel&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Chloe&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Sebastian&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Camila&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;David&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Sofia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Carter&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Avery&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Wyatt&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ella&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jayden&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mila&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;John&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Aria&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Owen&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Eleanor&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Dylan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hannah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Luke&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lily&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Gabriel&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Addison&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Anthony&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Aubrey&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Isaac&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Stella&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Grayson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Zoe&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jack&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Nora&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Julian&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Leah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Christopher&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hazel&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Joshua&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Violet&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Andrew&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lillian&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Sam&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Zoey&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ryan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Natalie&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hunter&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Penelope&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Nathan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Riley&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Christian&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lucy&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Isaiah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Alyssa&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Caleb&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ellie&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Josiah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Paisley&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Aaron&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Nora&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Eli&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Brooklyn&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Landon&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Liliana&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jonathan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Savannah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Nolan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Maya&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jeremiah&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hailey&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Easton&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Aaliyah&quot;</span>
+<span class="p">]</span>
+
+<span class="n">_PERSON_SURNAMES</span> <span class="o">=</span> <span class="p">[</span>
+	<span class="s2">&quot;Smith&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Johnson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Williams&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Brown&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jones&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Miller&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Davis&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Garcia&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Rodriguez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Martinez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hernandez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lopez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Gonzalez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Wilson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Anderson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Thomas&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Taylor&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Moore&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jackson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Martin&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lee&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Perez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Thompson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;White&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Harris&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Clark&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lewis&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Robinson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Walker&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Young&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Allen&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;King&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Wright&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Scott&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Nguyen&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hill&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Turner&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mitchell&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Jenkins&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Cook&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Morgan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hughes&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Reed&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Bennett&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ross&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Brooks&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Coleman&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mason&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Butler&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Parker&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Miller&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Cox&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Gray&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Wood&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hayes&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Russell&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Rogers&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Gomez&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Long&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Stewart&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Morales&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;James&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Reyes&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Foster&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Sullivan&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mendoza&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Bishop&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Murray&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Ford&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Gardner&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Boyd&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Harvey&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Olson&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Howell&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Dean&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Hansen&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Weaver&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Dunn&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Haynes&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Caldwell&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Lowe&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Barker&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Mata&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Warner&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Berry&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Luna&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Willis&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Higgins&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;Potter&quot;</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="utc_now_zulu_str">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.utc_now_zulu_str">[docs]</a>
+<span class="k">def</span> <span class="nf">utc_now_zulu_str</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. 2023-09-20T10:30:00Z &quot;&quot;&quot;</span>
+
+	<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span> <span class="n">_ZULU_TIME_FORMAT</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="delta_ago_zulu_str">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.delta_ago_zulu_str">[docs]</a>
+<span class="k">def</span> <span class="nf">delta_ago_zulu_str</span><span class="p">(</span><span class="n">days</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. 2023-09-20T10:30:00Z &quot;&quot;&quot;</span>
+
+	<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">minutes</span><span class="o">=</span><span class="n">minutes</span><span class="p">,</span> <span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">),</span> <span class="n">_ZULU_TIME_FORMAT</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mac_address">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.mac_address">[docs]</a>
+<span class="k">def</span> <span class="nf">mac_address</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. 10:66:61:0E:3F:C1 &quot;&quot;&quot;</span>
+
+	<span class="c1"># The first byte of a MAC address should start with a 0 in the least significant bit</span>
+	<span class="c1"># 0x00 to 0x7F in hexadecimal</span>
+	<span class="n">first_byte</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span>
+	<span class="n">mac_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_byte</span><span class="p">]</span>
+
+	<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+		<span class="n">random_byte</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+		<span class="n">mac_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random_byte</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">byte</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">byte</span> <span class="ow">in</span> <span class="n">mac_list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="phone_number">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.phone_number">[docs]</a>
+<span class="k">def</span> <span class="nf">phone_number</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+	<span class="n">first_digit</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+	<span class="n">rest_digits</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+
+	<span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;+34</span><span class="si">{</span><span class="n">first_digit</span><span class="si">}{</span><span class="n">rest_digits</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="person_name">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.person_name">[docs]</a>
+<span class="k">def</span> <span class="nf">person_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. Isaiah &quot;&quot;&quot;</span>
+
+	<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_NAMES</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="person_full_name">
+<a class="viewcode-back" href="../../testessera.html#testessera.generator.person_full_name">[docs]</a>
+<span class="k">def</span> <span class="nf">person_full_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. Isaiah Morgan &quot;&quot;&quot;</span>
+
+	<span class="n">random_name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_NAMES</span><span class="p">)</span>
+	<span class="n">random_surname</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_SURNAMES</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random_name</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">random_surname</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, David D..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
