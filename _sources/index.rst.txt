@@ -121,24 +121,19 @@ Reference
    :undoc-members:
    :show-inheritance:
 
-.. _testessera_restrequest:
+.. _testessera_kafka:
 
-.. autoclass:: testessera.RestRequest
+.. automodule:: testessera.kafka
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. _testessera_restclient:
+.. _testessera_generator:
 
-.. autoclass:: testessera.RestClient
+.. automodule:: testessera.generator
    :members:
    :undoc-members:
    :show-inheritance:
-
-.. _testessera_kafkaconsumer:
-
-.. autoclass:: testessera.KafkaConsumer
-   :members:
 
 .. _indices_and_tables:
 

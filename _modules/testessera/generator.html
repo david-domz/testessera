@@ -41,15 +41,8 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Reference - Code API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../testessera.html">testessera package</a></li>
-</ul>
-
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
         </div>
       </div>
     </nav>
@@ -75,7 +68,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for testessera.generator</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;This module provides functions that return realistic test data.</span>
+<span></span><span class="sd">&quot;&quot;&quot;Provides functions that return realistic test data.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
@@ -283,7 +276,7 @@
 <div class="viewcode-block" id="utc_now_zulu_str">
 <a class="viewcode-back" href="../../testessera.html#testessera.generator.utc_now_zulu_str">[docs]</a>
 <span class="k">def</span> <span class="nf">utc_now_zulu_str</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. 2023-09-20T10:30:00Z &quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Returns the current UTC date and time string. E.g. 2023-09-20T10:30:00Z &quot;&quot;&quot;</span>
 
 	<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span> <span class="n">_ZULU_TIME_FORMAT</span><span class="p">)</span></div>
 
@@ -301,7 +294,7 @@
 <div class="viewcode-block" id="mac_address">
 <a class="viewcode-back" href="../../testessera.html#testessera.generator.mac_address">[docs]</a>
 <span class="k">def</span> <span class="nf">mac_address</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. 10:66:61:0E:3F:C1 &quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Returns a random MAC address. E.g. 10:66:61:0E:3F:C1 &quot;&quot;&quot;</span>
 
 	<span class="c1"># The first byte of a MAC address should start with a 0 in the least significant bit</span>
 	<span class="c1"># 0x00 to 0x7F in hexadecimal</span>
@@ -319,6 +312,7 @@
 <div class="viewcode-block" id="phone_number">
 <a class="viewcode-back" href="../../testessera.html#testessera.generator.phone_number">[docs]</a>
 <span class="k">def</span> <span class="nf">phone_number</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Returns a random phone number. &quot;&quot;&quot;</span>
 
 	<span class="n">first_digit</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
 	<span class="n">rest_digits</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
@@ -330,7 +324,7 @@
 <div class="viewcode-block" id="person_name">
 <a class="viewcode-back" href="../../testessera.html#testessera.generator.person_name">[docs]</a>
 <span class="k">def</span> <span class="nf">person_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. Isaiah &quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Returns a person name. E.g. Isaiah &quot;&quot;&quot;</span>
 
 	<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_NAMES</span><span class="p">)</span></div>
 
@@ -339,7 +333,7 @@
 <div class="viewcode-block" id="person_full_name">
 <a class="viewcode-back" href="../../testessera.html#testessera.generator.person_full_name">[docs]</a>
 <span class="k">def</span> <span class="nf">person_full_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;E.g. Isaiah Morgan &quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Returns a person ful lname. E.g. Isaiah Morgan &quot;&quot;&quot;</span>
 
 	<span class="n">random_name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_NAMES</span><span class="p">)</span>
 	<span class="n">random_surname</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_PERSON_SURNAMES</span><span class="p">)</span>
