@@ -233,7 +233,7 @@ class KafkaProducer():
 			NotImplementedError
 
 		"""
-		self._producer.produce(topic, key, value, partition, timestamp=timestamp, headers=headers)
+		self._producer.produce(topic, value, key, partition, timestamp=timestamp, headers=headers)
 
 		print(f'Flushing message to {topic}')
 		self._producer.flush()
