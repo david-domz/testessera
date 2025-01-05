@@ -1,6 +1,3 @@
-"""Testessera Kafka related classes and functions.
-
-"""
 from typing import Optional, Union
 from collections import deque
 import logging
@@ -14,11 +11,10 @@ from confluent_kafka import (
 	KafkaError
 )
 from testessera.json import assert_json
-import testessera.generator
 
 
 class KafkaConsumer():
-	"""Kafka consumer for testing environments.
+	"""Kafka consumer for test environments.
 
 	It encapsulates a Kafka consumer using the `confluent_kafka` library. It allows
 	for the consumption and processing of Kafka messages from specified topics.

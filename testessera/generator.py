@@ -2,6 +2,7 @@
 
 """
 from datetime import datetime, timedelta
+import uuid
 import random
 
 
@@ -252,3 +253,9 @@ def person_full_name() -> str:
 	random_surname = random.choice(_PERSON_SURNAMES)
 
 	return f'{random_name} {random_surname}'
+
+
+def identifier_suffix() -> str:
+	"""Returns an identifier suffix composed by 8 random hex characters. """
+
+	return f'{uuid.uuid4().hex[:8]}'

@@ -1,6 +1,4 @@
-"""Testessera REST related classes and functions.
-
-"""
+from typing import Optional
 import re
 import requests
 from testessera.json import assert_json
@@ -55,6 +53,30 @@ class RestRequest():
 		return f'RestRequest({self.method}, {self.path}, {self.headers}, {self._body})'
 
 
+class Get(RestRequest):
+	def __init__(self, path: str, headers=None, query_params=None):
+		super().__init__('GET', path, headers=headers, query_params=query_params)
+
+
+class Post(RestRequest):
+	def __init__(self, path: str, body, headers=None, query_params=None):
+		super().__init__('POST', path, body, headers, query_params)
+
+
+class Put(RestRequest):
+	def __init__(self, path: str, body, headers=None, query_params=None):
+		super().__init__('PUT', path, body, headers, query_params)
+
+class Patch(RestRequest):
+	def __init__(self, path: str, body, headers=None, query_params=None):
+		super().__init__('PATCH', path, body, headers, query_params)
+
+
+class Delete(RestRequest):
+	def __init__(self, path: str):
+		super().__init__('DELETE', path)
+
+
 class RestClient():
 	"""
 
@@ -66,7 +88,7 @@ class RestClient():
 		_session (requests.Session):	Underlaying `requests.Session`.
 
 	"""
-	def __init__(self, base_url: str, api_key=None, timeout: int = 60, verify=None):
+	def __init__(self, base_url: str, api_key=None, timeout: int = 20, verify=None):
 
 		self._base_url = base_url
 		self._api_key = api_key
@@ -79,7 +101,7 @@ class RestClient():
 	def request(self, rest_request: RestRequest) -> requests.Response:
 		"""
 
-		The effective request URL is compose by combining the `_base_url` attribute with
+		The request URL is composed by combining the `_base_url` attribute with
 		`RestRequest.path` and `RestRequest.query_params`.
 
 		Raises:
@@ -89,28 +111,88 @@ class RestClient():
 			* Consider using Request params instead of _build_url()
 
 		"""
-		url = self._build_url(rest_request)
+		url = self._build_url(rest_request.path, rest_request.query_params)
+		return self._request(rest_request.method, url, rest_request.headers, rest_request.body)
 
-		headers = None
+
+	def get(self, path: str,
+			headers: Optional[dict] = None,
+			query_params: Optional[dict] = None) -> requests.Response:
+
+		url = self._build_url(path, query_params)
+		return self._request('GET', url, headers)
+
+
+	def post(self, path: str,
+			body: dict,
+			headers: Optional[dict] = None,
+			query_params: Optional[dict] = None) -> requests.Response:
+		"""
+
+		Args:
+			path (str):			Request path without the base URL. E.g. `/provision`.
+			body (dict):			Request body.
+			headers (Optional[dict]):	Request headers.
+			query_params (Optional[dict]):	Request query parameters.
+
+		"""
+		url = self._build_url(path, query_params)
+		return self._request('POST', url, headers, body)
+
+
+	def patch(self, path: str,
+			body: dict,
+			headers: Optional[dict] = None,
+			query_params: Optional[dict] = None) -> requests.Response:
+
+		url = self._build_url(path, query_params)
+		return self._request('PATCH', url, headers, body)
+
+
+	def put(self, path: str,
+			body: dict,
+			headers: Optional[dict] = None,
+			query_params: Optional[dict] = None) -> requests.Response:
+
+		url = self._build_url(path, query_params)
+		return self._request('PUT', url, headers, body)
+
+
+	def delete(self, path: str,
+			headers: Optional[dict] = None,
+			query_params: Optional[dict] = None) -> requests.Response:
+
+		url = self._build_url(path, query_params)
+		return self._request('DELETE', url, headers)
+
+
+	def _build_url(self, path: str, query_params=None) -> str:
+
+		if query_params:
+			query_params = [f'{param}={value}' for param, value in query_params.items()]
+			query_params = '&'.join(query_params)
+			url = f'{self._base_url}{path}?{query_params}'
+		else:
+			url = f'{self._base_url}{path}'
+
+		return url
+
+
+	def _request(self,
+			method: str,
+			url: str,
+			headers: Optional[dict] = None,
+			body: Optional[dict] = None) -> requests.Response:
+
 		if self._api_key:
-			headers = {'X-API-Key': self._api_key}
+			if headers is None:
+				headers = {}
+			headers['X-API-Key'] = self._api_key
 
-		request = requests.Request(rest_request.method, url, headers, json=rest_request.body)
+		request = requests.Request(method, url, headers, json=body)
 		prepared_request = request.prepare()
 
 		return self._session.send(prepared_request, verify=self._verify, timeout=self._timeout)
-
-
-	def _build_url(self, rest_request: RestRequest) -> str:
-
-		query_params = [f'{param}={value}' for param, value in rest_request.query_params.items()]
-		if query_params:
-			query_params = '&'.join(query_params)
-			url = f'{self._base_url}{rest_request.path}?{query_params}'
-		else:
-			url = f'{self._base_url}{rest_request.path}'
-
-		return url
 
 
 def assert_http_response(response: requests.Response, status_code: int, headers=None):
