@@ -67,6 +67,7 @@ class Put(RestRequest):
 	def __init__(self, path: str, body, headers=None, query_params=None):
 		super().__init__('PUT', path, body, headers, query_params)
 
+
 class Patch(RestRequest):
 	def __init__(self, path: str, body, headers=None, query_params=None):
 		super().__init__('PATCH', path, body, headers, query_params)
