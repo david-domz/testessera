@@ -53,31 +53,6 @@ class RestRequest():
 		return f'RestRequest({self.method}, {self.path}, {self.headers}, {self._body})'
 
 
-class Get(RestRequest):
-	def __init__(self, path: str, headers=None, query_params=None):
-		super().__init__('GET', path, headers=headers, query_params=query_params)
-
-
-class Post(RestRequest):
-	def __init__(self, path: str, body, headers=None, query_params=None):
-		super().__init__('POST', path, body, headers, query_params)
-
-
-class Put(RestRequest):
-	def __init__(self, path: str, body, headers=None, query_params=None):
-		super().__init__('PUT', path, body, headers, query_params)
-
-
-class Patch(RestRequest):
-	def __init__(self, path: str, body, headers=None, query_params=None):
-		super().__init__('PATCH', path, body, headers, query_params)
-
-
-class Delete(RestRequest):
-	def __init__(self, path: str):
-		super().__init__('DELETE', path)
-
-
 class RestClient():
 	"""
 
