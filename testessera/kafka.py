@@ -124,7 +124,7 @@ class KafkaConsumer():
 					break
 
 
-	def consume_one(self, timeout: float = 2.0) -> Optional[Message]:
+	def consume_one(self, timeout: float = 10.0) -> Optional[Message]:
 		"""Consumes and processes a Kafka message.
 
 		It consumes a single Kafka message and process it. If a message
@@ -230,10 +230,7 @@ class KafkaProducer():
 
 		"""
 		self._producer.produce(topic, value, key, partition, timestamp=timestamp, headers=headers)
-
-		print(f'Flushing message to {topic}')
 		self._producer.flush()
-		print('Done')
 
 
 def assert_kafka_message(
