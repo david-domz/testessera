@@ -1,11 +1,6 @@
 from testessera.json import assert_json
 from testessera.rest import (
 	RestRequest,
-	Get,
-	Post,
-	Put,
-	Patch,
-	Delete,
 	RestClient,
 	assert_rest_response,
 	assert_problem_json_response
