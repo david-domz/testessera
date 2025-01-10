@@ -124,7 +124,7 @@ class KafkaConsumer():
 					break
 
 
-	def consume_one(self, timeout: float = 10.0) -> Optional[Message]:
+	def consume_one(self, timeout: float = 20.0) -> Optional[Message]:
 		"""Consumes and processes a Kafka message.
 
 		It consumes a single Kafka message and process it. If a message
@@ -267,7 +267,10 @@ def assert_kafka_message(
 	for key, expected_value in kwargs.items():
 		actual_value = json_instance[key]
 		assert actual_value == expected_value,	\
-			f'Expected property `{key}` value was {expected_value} but got value {actual_value}'
+			(
+				f'Expected property `{key}` was `{expected_value}` but got `{actual_value}`'
+				f' in Kafka message {json_instance}'
+			)
 
 
 def assert_no_kafka_message(msg: Optional[Message]):

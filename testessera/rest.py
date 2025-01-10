@@ -64,7 +64,7 @@ class RestClient():
 		_session (requests.Session):	Underlaying `requests.Session`.
 
 	"""
-	def __init__(self, base_url: str, api_key=None, timeout: int = 20, verify=None):
+	def __init__(self, base_url: str, api_key=None, timeout: int = 60, verify=None):
 
 		self._base_url = base_url
 		self._api_key = api_key
