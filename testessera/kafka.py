@@ -10,7 +10,7 @@ from confluent_kafka import (
 	Message,
 	KafkaError
 )
-from testessera.json import assert_json
+from testessera import assert_json
 
 
 class KafkaConsumer():
@@ -121,10 +121,11 @@ class KafkaConsumer():
 			if msg:
 				error = msg.error()
 				if error and error.code() == KafkaError._PARTITION_EOF:	# pylint: disable=protected-access
+					logging.warning('\nConsumer assignement: %s', self.consumer.assignment())
 					break
 
 
-	def consume_one(self, timeout: float = 20.0) -> Optional[Message]:
+	def consume_one(self, timeout: float = 60.0) -> Optional[Message]:
 		"""Consumes and processes a Kafka message.
 
 		It consumes a single Kafka message and process it. If a message

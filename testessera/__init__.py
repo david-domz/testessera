@@ -2,6 +2,7 @@ from testessera.json import assert_json
 from testessera.rest import (
 	RestRequest,
 	RestClient,
+	assert_http_response,
 	assert_rest_response,
 	assert_problem_json_response
 )
